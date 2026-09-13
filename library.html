@@ -497,8 +497,81 @@
     text-shadow:0 0 6px rgba(141,255,180,.4);
   }
 
+  /* -- World clocks: Athens, Bogotá, São Paulo, London -- */
+  .wclocks{
+    position:fixed;
+    top:44px;right:14px;
+    display:flex;
+    gap:10px;
+  }
+  .wclock{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+  }
+  .wclock-face{
+    position:relative;
+    width:34px;height:34px;
+    border-radius:50%;
+    background:radial-gradient(circle at center, rgba(10,26,15,.92) 0%, rgba(4,12,6,.96) 100%);
+    border:1px solid var(--spy-green-dim);
+    box-shadow:0 0 8px rgba(120,255,160,.25), inset 0 0 6px rgba(0,0,0,.6);
+  }
+  .wclock-face .hand{
+    position:absolute;
+    left:50%;bottom:50%;
+    transform-origin:50% 100%;
+    border-radius:2px;
+    background:var(--spy-green);
+  }
+  .wclock-face .hand.hour{width:2px;height:8px;margin-left:-1px;}
+  .wclock-face .hand.min{width:1.4px;height:12px;margin-left:-.7px;}
+  .wclock-face .hand.sec{width:1px;height:13px;margin-left:-.5px;background:var(--spy-red);}
+  .wclock-face .pin{
+    position:absolute;
+    left:50%;top:50%;
+    width:3px;height:3px;
+    margin:-1.5px 0 0 -1.5px;
+    border-radius:50%;
+    background:var(--spy-green);
+  }
+  .wclock-label{
+    font:700 7.5px/1 var(--spy-font);
+    color:var(--spy-green);
+    letter-spacing:.04em;
+    text-shadow:0 0 5px rgba(141,255,180,.4);
+  }
+
+  /* -- "DARK WEB" monitor with a matrix-style code rain -- */
+  .dw-monitor{
+    position:fixed;
+    top:44px;left:14px;
+    width:150px;
+    border-radius:6px;
+    background:#111;
+    border:2px solid #333;
+    box-shadow:0 4px 14px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.04);
+    overflow:hidden;
+  }
+  .dw-monitor .dw-titlebar{
+    background:#000;
+    color:#fff;
+    font:700 11px/1 var(--spy-font);
+    letter-spacing:.08em;
+    text-align:center;
+    padding:6px 0;
+    border-bottom:1px solid #2a2a2a;
+  }
+  .dw-monitor canvas{
+    display:block;
+    width:100%;
+    height:80px;
+    background:#000;
+  }
+
   @media (max-width:600px){
-    .hud-readout,.hud-stamp,.hud-rec{display:none;}
+    .hud-readout,.hud-stamp,.hud-rec,.wclocks,.dw-monitor{display:none;}
     .radar{width:96px;height:96px;bottom:12px;right:12px;}
     .radar-label{bottom:112px;right:12px;}
     .hud-corner{width:18px;height:18px;}
@@ -536,6 +609,31 @@
     <div class="tag">SEC. CLEARANCE: OMEGA · GRID 41Q NQ 30412 70951</div>
   </div>
   <div class="hud-stamp">Top Secret<br>Skiad Eyes Only</div>
+
+  <div class="wclocks" id="worldClocks">
+    <div class="wclock" data-tz="Europe/Athens">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">ATHENS</div>
+    </div>
+    <div class="wclock" data-tz="America/Bogota">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">BOGOTÁ</div>
+    </div>
+    <div class="wclock" data-tz="America/Sao_Paulo">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">BRAZIL</div>
+    </div>
+    <div class="wclock" data-tz="Europe/London">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">LONDON</div>
+    </div>
+  </div>
+
+  <div class="dw-monitor">
+    <div class="dw-titlebar">DARK WEB</div>
+    <canvas id="dwCanvas" width="150" height="80"></canvas>
+  </div>
+
   <div class="radar-label">SKIAD NET // SCANNING</div>
   <div class="radar" id="radarWidget">
     <div class="radar-rings"></div>
@@ -1041,8 +1139,79 @@
     function pad(n){ return String(n).length < 2 ? "0" + n : String(n); }
     el.textContent = pad(now.getUTCHours()) + ":" + pad(now.getUTCMinutes()) + ":" + pad(now.getUTCSeconds()) + " UTC";
   }
+
+  // Reads the current hour/minute/second in a given IANA timezone.
+  function getZonedHMS(timeZone){
+    var parts;
+    try {
+      parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: timeZone, hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"
+      }).formatToParts(new Date());
+    } catch (e){
+      return null; // unsupported timezone in this browser
+    }
+    var h = 0, m = 0, s = 0;
+    parts.forEach(function(p){
+      if (p.type === "hour") h = parseInt(p.value, 10);
+      if (p.type === "minute") m = parseInt(p.value, 10);
+      if (p.type === "second") s = parseInt(p.value, 10);
+    });
+    return { h: h % 24, m: m, s: s };
+  }
+
+  // Ticks the four analog world clocks (Athens, Bogotá, São Paulo, London).
+  function updateWorldClocks(){
+    var clocks = document.querySelectorAll("#worldClocks .wclock");
+    clocks.forEach(function(clockEl){
+      var hms = getZonedHMS(clockEl.getAttribute("data-tz"));
+      if (!hms) return;
+      var hourAngle = ((hms.h % 12) + hms.m / 60) * 30;
+      var minAngle = (hms.m + hms.s / 60) * 6;
+      var secAngle = hms.s * 6;
+      var hourHand = clockEl.querySelector(".hand.hour");
+      var minHand = clockEl.querySelector(".hand.min");
+      var secHand = clockEl.querySelector(".hand.sec");
+      if (hourHand) hourHand.style.transform = "rotate(" + hourAngle + "deg)";
+      if (minHand) minHand.style.transform = "rotate(" + minAngle + "deg)";
+      if (secHand) secHand.style.transform = "rotate(" + secAngle + "deg)";
+    });
+  }
+
   updateHudClock();
-  setInterval(updateHudClock, 1000);
+  updateWorldClocks();
+  setInterval(function(){
+    updateHudClock();
+    updateWorldClocks();
+  }, 1000);
+
+  // "DARK WEB" monitor: a classic green matrix-style code rain, purely
+  // for hacker-movie atmosphere.
+  function initDarkWebMatrix(){
+    var canvas = document.getElementById("dwCanvas");
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    var w = canvas.width, h = canvas.height;
+    var fontSize = 10;
+    var columns = Math.floor(w / fontSize);
+    var drops = [];
+    for (var i = 0; i < columns; i++) drops[i] = Math.random() * (h / fontSize);
+    var chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ$#%&@*<>/\\";
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, w, h);
+    setInterval(function(){
+      ctx.fillStyle = "rgba(0,0,0,.12)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#4dff7a";
+      ctx.font = fontSize + "px monospace";
+      for (var col = 0; col < drops.length; col++){
+        var ch = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(ch, col * fontSize, drops[col] * fontSize);
+        if (drops[col] * fontSize > h && Math.random() > .975) drops[col] = 0;
+        drops[col]++;
+      }
+    }, 60);
+  }
+  initDarkWebMatrix();
 
   /* ---------------- Boot ---------------- */
   openDB().then(function(_db){
