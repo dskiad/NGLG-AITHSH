@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Skiad Repo</title>
+<style>
+  :root{
+    --wood-dark:#2b1b12;
+    --wood:#3d2817;
+    --wood-light:#5a3a22;
+    --plank:#6b4423;
+    --plank-edge:#4a2f18;
+    --gold:#d9a94d;
+    --gold-light:#f0cd8a;
+    --cream:#f4ead6;
+    --ink:#241608;
+    --panel:#efe4cd;
+    --panel-line:#cbb98b;
+    --danger:#b3261e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top, rgba(255,215,140,.08), transparent 60%),
+      linear-gradient(180deg, var(--wood-dark) 0%, #1c1108 100%);
+    font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif;
+    color:var(--cream);
+    padding-bottom:60px;
+  }
+
+  /* ---------- Header ---------- */
+  header.hero{
+    text-align:center;
+    padding:38px 16px 22px;
+    background:linear-gradient(180deg, rgba(0,0,0,.35), transparent);
+    border-bottom:1px solid rgba(217,169,77,.25);
+  }
+  header.hero .crest{
+    width:46px;height:46px;margin:0 auto 10px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold);
+    font-size:20px;
+  }
+  header.hero h1{
+    margin:0;
+    font-size:clamp(28px,6vw,44px);
+    letter-spacing:.04em;
+    color:var(--gold-light);
+    text-shadow:0 2px 10px rgba(0,0,0,.5);
+  }
+  header.hero p.sub{
+    margin:8px auto 0;
+    max-width:560px;
+    font-size:14px;
+    color:#cbb98b;
+    letter-spacing:.02em;
+    line-height:1.5;
+  }
+  header.hero .toolbar{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:13px;
+    letter-spacing:.03em;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid var(--gold);
+    background:transparent;
+    color:var(--gold-light);
+    cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .btn:hover{background:var(--gold);color:var(--wood-dark);}
+  .btn.subtle{
+    border-color:rgba(217,169,77,.4);
+    color:#cbb98b;
+    font-size:12px;
+  }
+  .btn.subtle:hover{background:rgba(217,169,77,.15);color:var(--gold-light);}
+  .btn.danger{border-color:#c96a5f;color:#e8a99f;}
+  .btn.danger:hover{background:#c96a5f;color:#2b1b12;}
+  #saveStatus{
+    font-size:11px;
+    color:#9c8a63;
+    text-align:center;
+    margin-top:10px;
+    min-height:14px;
+  }
+
+  /* ---------- Shelves ---------- */
+  .stacks{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 14px 0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .shelf-unit{
+    position:relative;
+  }
+  .shelf-header{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:0 6px 6px 2px;
+  }
+  .shelf-header .idx{
+    font-size:11px;
+    color:#8a7452;
+    min-width:20px;
+    flex-shrink:0;
+  }
+  .genre-title{
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    border:none;
+    background:transparent;
+    outline:none;
+    cursor:text;
+    border-bottom:1px dashed transparent;
+    padding:1px 2px;
+    flex:0 0 auto;
+    min-width:60px;
+    max-width:80vw;
+  }
+  .genre-title:hover,.genre-title:focus{
+    border-bottom-color:var(--gold);
+  }
+  .shelf-header .pencil-hint{
+    color:#7a6544;
+    font-size:11px;
+  }
+
+  .shelf-body{
+    position:relative;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.28), transparent 30%),
+      repeating-linear-gradient(90deg, var(--wood) 0 3px, var(--wood-light) 3px 6px);
+    border-radius:6px 6px 2px 2px;
+    padding:14px 10px 0;
+    box-shadow:inset 0 0 24px rgba(0,0,0,.35);
+  }
+  .books-row{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scrollbar-width:thin;
+  }
+  .plank{
+    height:16px;
+    background:linear-gradient(180deg, var(--plank) 0%, var(--plank-edge) 100%);
+    border-radius:0 0 5px 5px;
+    box-shadow:0 6px 10px -4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  /* ---------- Book cover ---------- */
+  .book{
+    position:relative;
+    flex:0 0 auto;
+    width:78px;
+    height:112px;
+    border-radius:4px 6px 6px 4px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:6px 5px;
+    cursor:pointer;
+    box-shadow:
+      2px 3px 6px rgba(0,0,0,.45),
+      inset -3px 0 0 rgba(0,0,0,.25),
+      inset 2px 0 0 rgba(255,255,255,.08);
+    background-size:cover;
+    background-position:center;
+    transition:transform .12s ease;
+    border:1px solid rgba(0,0,0,.3);
+  }
+  .book:hover{transform:translateY(-6px);}
+  .book .cover-icon{
+    width:22px;height:22px;
+    flex-shrink:0;
+    margin-top:2px;
+    margin-bottom:3px;
+    opacity:.9;
+    color:#fff;
+  }
+  .book .cover-icon svg{width:100%;height:100%;display:block;}
+  .book .book-title{
+    /* fills the remaining height below the icon and centers the title
+       text (both lines and the block as a whole) within it */
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:10.5px;
+    line-height:1.2;
+    font-weight:700;
+    color:#fff;
+    text-align:center;
+    text-shadow:0 1px 3px rgba(0,0,0,.6);
+    overflow:hidden;
+    overflow-wrap:break-word;
+    word-break:break-word;
+    width:100%;
+  }
+  .book.has-badge{
+    padding-bottom:16px;
+  }
+  .book .type-badge{
+    position:absolute;
+    bottom:3px;
+    right:4px;
+    font-size:8px;
+    letter-spacing:.03em;
+    background:rgba(0,0,0,.45);
+    color:#fff;
+    padding:1px 4px;
+    border-radius:3px;
+    text-transform:uppercase;
+  }
+  .book.empty{
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 8px, rgba(255,255,255,.01) 8px 16px);
+    border:1px dashed rgba(217,169,77,.4);
+  }
+  .book.empty .plus{
+    font-size:22px;
+    color:var(--gold);
+    line-height:1;
+  }
+  .book.empty .book-title{
+    color:#b39f78;
+    margin-top:4px;
+    font-weight:600;
+  }
+  .book .edit-btn{
+    position:absolute;
+    top:3px;right:3px;
+    width:19px;height:19px;
+    border-radius:50%;
+    background:rgba(20,12,6,.65);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    padding:0;
+  }
+  .book .edit-btn svg{width:11px;height:11px;}
+  .book .edit-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--wood-dark);}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(10,6,2,.7);
+    display:none;
+    align-items:center;justify-content:center;
+    padding:16px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);
+    color:var(--ink);
+    width:100%;max-width:380px;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  .modal h3{
+    margin:0 0 14px;
+    font-family:Georgia,serif;
+    font-size:18px;
+    color:#3d2817;
+  }
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;
+    color:#6b5636;margin-bottom:4px;
+  }
+  .field input[type=text],
+  .field input[type=url],
+  .field select{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--panel-line);
+    border-radius:6px;
+    font-size:14px;
+    background:#fff;
+    font-family:inherit;
+  }
+  .field input[type=file]{
+    font-size:12px;width:100%;
+  }
+  .field .hint{font-size:11px;color:#7a6544;margin-top:4px;}
+  .current-file{
+    font-size:12px;color:#3d2817;background:#e4d6b3;
+    padding:6px 8px;border-radius:6px;margin-top:6px;
+    word-break:break-all;
+  }
+  .modal-actions{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:18px;gap:8px;flex-wrap:wrap;
+  }
+  .modal-actions .right{display:flex;gap:8px;}
+  .mbtn{
+    font-family:inherit;font-size:13px;
+    padding:8px 14px;border-radius:6px;border:1px solid transparent;
+    cursor:pointer;
+  }
+  .mbtn.save{background:#3d2817;color:#f0cd8a;}
+  .mbtn.save:hover{background:#2b1b12;}
+  .mbtn.cancel{background:transparent;color:#6b5636;border-color:#cbb98b;}
+  .mbtn.cancel:hover{background:#e4d6b3;}
+  .mbtn.clear{background:transparent;color:#b3261e;border-color:#e2b3ae;}
+  .mbtn.clear:hover{background:#f6e2df;}
+
+  footer{
+    text-align:center;
+    color:#7a6544;
+    font-size:11px;
+    margin-top:36px;
+    padding:0 16px;
+  }
+
+  @media (max-width:480px){
+    .book{width:70px;height:104px;}
+  }
+
+  /* ================= Surveillance HUD overlay ==================
+     Purely decorative — a tongue-in-cheek "secret agency" layer over
+     the library. Everything in it is pointer-events:none so it never
+     blocks clicking shelves, books, or buttons underneath. */
+  :root{
+    --spy-green:#8dffb4;
+    --spy-green-dim:rgba(141,255,180,.35);
+    --spy-red:#ff5c5c;
+    --spy-font:ui-monospace,"SFMono-Regular","Courier New",Menlo,Consolas,monospace;
+  }
+  #spyOverlay{
+    position:fixed;
+    inset:0;
+    z-index:40;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  #spyOverlay .vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.35) 100%);
+  }
+  #spyOverlay .crt-scanlines{
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(to bottom,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+      var(--spy-green-dim) 3px, var(--spy-green-dim) 3px);
+    opacity:.12;
+    mix-blend-mode:screen;
+  }
+  #spyOverlay .scan-beam{
+    position:absolute;
+    left:0;right:0;top:-140px;
+    height:140px;
+    background:linear-gradient(to bottom,
+      rgba(141,255,180,0) 0%, rgba(141,255,180,.06) 45%,
+      rgba(141,255,180,.1) 50%, rgba(141,255,180,.06) 55%,
+      rgba(141,255,180,0) 100%);
+    animation:scanBeamMove 7s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes scanBeamMove{
+    0%{top:-140px;}
+    100%{top:100%;}
+  }
+
+  .hud-corner{
+    position:fixed;
+    width:26px;height:26px;
+    border-color:var(--spy-green-dim);
+    border-style:solid;
+    border-width:0;
+    filter:drop-shadow(0 0 4px rgba(141,255,180,.25));
+  }
+  .hud-corner.tl{top:10px;left:10px;border-top-width:2px;border-left-width:2px;}
+  .hud-corner.tr{top:10px;right:10px;border-top-width:2px;border-right-width:2px;}
+  .hud-corner.bl{bottom:10px;left:10px;border-bottom-width:2px;border-left-width:2px;}
+
+  .hud-rec{
+    position:fixed;
+    top:14px;right:44px;
+    font:700 10px/1 var(--spy-font);
+    color:var(--spy-red);
+    letter-spacing:.06em;
+    text-shadow:0 0 6px rgba(255,92,92,.6);
+    animation:recBlink 1.4s steps(1) infinite;
+  }
+  @keyframes recBlink{50%{opacity:.15;}}
+
+  .hud-readout{
+    position:fixed;
+    top:14px;left:44px;
+    font-family:var(--spy-font);
+    color:var(--spy-green);
+    text-shadow:0 0 6px rgba(141,255,180,.4);
+    line-height:1.4;
+  }
+  .hud-readout .clock{font-size:12px;font-weight:700;letter-spacing:.04em;}
+  .hud-readout .tag{font-size:9px;color:var(--spy-green-dim);letter-spacing:.03em;}
+
+  .hud-stamp{
+    position:fixed;
+    bottom:16px;left:44px;
+    transform:rotate(-8deg);
+    border:2px solid rgba(255,92,92,.65);
+    border-radius:4px;
+    padding:4px 8px;
+    font:700 10px/1.3 var(--spy-font);
+    letter-spacing:.05em;
+    color:rgba(255,92,92,.75);
+    text-align:center;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+
+  .radar{
+    position:fixed;
+    bottom:18px;right:18px;
+    width:130px;height:130px;
+    border-radius:50%;
+    background:radial-gradient(circle at center,
+      rgba(20,45,28,.92) 0%, rgba(8,20,11,.96) 70%, rgba(3,9,4,1) 100%);
+    border:2px solid var(--spy-green-dim);
+    box-shadow:0 0 18px rgba(120,255,160,.3), inset 0 0 24px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .radar-rings,
+  .radar-rings::before,
+  .radar-rings::after{
+    border:1px solid var(--spy-green-dim);
+    border-radius:50%;
+  }
+  .radar-rings{position:absolute;inset:8%;}
+  .radar-rings::before{content:"";position:absolute;inset:25%;}
+  .radar-rings::after{content:"";position:absolute;inset:42%;}
+  .radar-cross{position:absolute;inset:0;}
+  .radar-cross::before,.radar-cross::after{
+    content:"";
+    position:absolute;
+    background:var(--spy-green-dim);
+  }
+  .radar-cross::before{left:6%;right:6%;top:50%;height:1px;}
+  .radar-cross::after{top:6%;bottom:6%;left:50%;width:1px;}
+  .radar-sweep{
+    position:absolute;inset:0;
+    border-radius:50%;
+    background:conic-gradient(from 0deg,
+      rgba(141,255,180,.55) 0deg, rgba(141,255,180,0) 60deg, rgba(141,255,180,0) 360deg);
+    animation:radarSweep 4s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes radarSweep{to{transform:rotate(360deg);}}
+  .radar-blip{
+    position:absolute;
+    width:5px;height:5px;
+    margin:-2.5px 0 0 -2.5px;
+    border-radius:50%;
+    background:#c8ffdd;
+    box-shadow:0 0 6px 2px rgba(141,255,180,.8);
+    animation:blipPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes blipPulse{
+    0%,100%{opacity:.15;transform:scale(.7);}
+    50%{opacity:1;transform:scale(1);}
+  }
+  .radar-label{
+    position:fixed;
+    bottom:150px;right:18px;
+    font:700 9px/1 var(--spy-font);
+    color:var(--spy-green);
+    letter-spacing:.06em;
+    text-align:right;
+    text-shadow:0 0 6px rgba(141,255,180,.4);
+  }
+
+  /* -- World clocks: Athens, Bogotá, São Paulo, London -- */
+  .wclocks{
+    position:fixed;
+    top:44px;right:14px;
+    display:flex;
+    gap:10px;
+  }
+  .wclock{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+  }
+  .wclock-face{
+    position:relative;
+    width:34px;height:34px;
+    border-radius:50%;
+    background:radial-gradient(circle at center, rgba(10,26,15,.92) 0%, rgba(4,12,6,.96) 100%);
+    border:1px solid var(--spy-green-dim);
+    box-shadow:0 0 8px rgba(120,255,160,.25), inset 0 0 6px rgba(0,0,0,.6);
+  }
+  .wclock-face .hand{
+    position:absolute;
+    left:50%;bottom:50%;
+    transform-origin:50% 100%;
+    border-radius:2px;
+    background:var(--spy-green);
+  }
+  .wclock-face .hand.hour{width:2px;height:8px;margin-left:-1px;}
+  .wclock-face .hand.min{width:1.4px;height:12px;margin-left:-.7px;}
+  .wclock-face .hand.sec{width:1px;height:13px;margin-left:-.5px;background:var(--spy-red);}
+  .wclock-face .pin{
+    position:absolute;
+    left:50%;top:50%;
+    width:3px;height:3px;
+    margin:-1.5px 0 0 -1.5px;
+    border-radius:50%;
+    background:var(--spy-green);
+  }
+  .wclock-label{
+    font:700 7.5px/1 var(--spy-font);
+    color:var(--spy-green);
+    letter-spacing:.04em;
+    text-shadow:0 0 5px rgba(141,255,180,.4);
+  }
+
+  /* -- "DARK WEB" monitor with a matrix-style code rain -- */
+  .dw-monitor{
+    position:fixed;
+    top:44px;left:14px;
+    width:150px;
+    border-radius:6px;
+    background:#111;
+    border:2px solid #333;
+    box-shadow:0 4px 14px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.04);
+    overflow:hidden;
+  }
+  .dw-monitor .dw-titlebar{
+    background:#000;
+    color:#fff;
+    font:700 11px/1 var(--spy-font);
+    letter-spacing:.08em;
+    text-align:center;
+    padding:6px 0;
+    border-bottom:1px solid #2a2a2a;
+  }
+  .dw-monitor canvas{
+    display:block;
+    width:100%;
+    height:80px;
+    background:#000;
+  }
+
+  @media (max-width:600px){
+    .hud-readout,.hud-stamp,.hud-rec,.wclocks,.dw-monitor{display:none;}
+    .radar{width:96px;height:96px;bottom:12px;right:12px;}
+    .radar-label{bottom:112px;right:12px;}
+    .hud-corner{width:18px;height:18px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="crest">☙</div>
+  <h1>Skiad Repo</h1>
+  <p class="sub">A library of everything worth keeping — repositories, photos, PDFs, and links, shelved by category. Click any book to open it, click the pencil to edit it.</p>
+  <div class="toolbar">
+    <button class="btn subtle" id="resetBtn" type="button">Reset library</button>
+    <button class="btn subtle" id="surveillanceToggle" type="button">🛰️ Surveillance: ON</button>
+  </div>
+  <div id="saveStatus"></div>
+</header>
+
+<main class="stacks" id="stacks"></main>
+
+<footer>Skiad Repo — your edits are saved automatically in this browser.</footer>
+
+<!-- Surveillance HUD overlay — just for fun, purely decorative, click-through -->
+<div id="spyOverlay" aria-hidden="true">
+  <div class="vignette"></div>
+  <div class="crt-scanlines"></div>
+  <div class="scan-beam"></div>
+  <div class="hud-corner tl"></div>
+  <div class="hud-corner tr"></div>
+  <div class="hud-corner bl"></div>
+  <div class="hud-rec">● REC</div>
+  <div class="hud-readout">
+    <div class="clock" id="hudClock">00:00:00 UTC</div>
+    <div class="tag">SEC. CLEARANCE: OMEGA · GRID 41Q NQ 30412 70951</div>
+  </div>
+  <div class="hud-stamp">Top Secret<br>Skiad Eyes Only</div>
+
+  <div class="wclocks" id="worldClocks">
+    <div class="wclock" data-tz="Europe/Athens">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">ATHENS</div>
+    </div>
+    <div class="wclock" data-tz="America/Bogota">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">BOGOTÁ</div>
+    </div>
+    <div class="wclock" data-tz="America/Sao_Paulo">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">BRAZIL</div>
+    </div>
+    <div class="wclock" data-tz="Europe/London">
+      <div class="wclock-face"><div class="hand hour"></div><div class="hand min"></div><div class="hand sec"></div><div class="pin"></div></div>
+      <div class="wclock-label">LONDON</div>
+    </div>
+  </div>
+
+  <div class="dw-monitor">
+    <div class="dw-titlebar">DARK WEB</div>
+    <canvas id="dwCanvas" width="150" height="80"></canvas>
+  </div>
+
+  <div class="radar-label">SKIAD NET // SCANNING</div>
+  <div class="radar" id="radarWidget">
+    <div class="radar-rings"></div>
+    <div class="radar-cross"></div>
+    <div class="radar-sweep"></div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalHeading">Edit book</h3>
+    <form id="editForm">
+      <div class="field">
+        <label for="f-title">Title</label>
+        <input type="text" id="f-title" maxlength="80" required>
+      </div>
+      <div class="field">
+        <label for="f-type">Opens</label>
+        <select id="f-type">
+          <option value="repo">GitHub / code repository</option>
+          <option value="website">Website link</option>
+          <option value="drive">Google Drive / Google Photos link</option>
+          <option value="photo">Uploaded photo</option>
+          <option value="pdf">Uploaded PDF</option>
+        </select>
+      </div>
+      <div class="field" id="f-url-field">
+        <label id="f-url-label" for="f-url">Repository URL</label>
+        <input type="url" id="f-url" placeholder="https://github.com/owner/repo">
+      </div>
+      <div class="field" id="f-file-field" style="display:none;">
+        <label id="f-file-label" for="f-file">Photo file</label>
+        <input type="file" id="f-file">
+        <div class="hint">Stored locally in this browser (IndexedDB).</div>
+        <div class="current-file" id="f-current-file" style="display:none;"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="mbtn clear" id="clearBtn">Clear book</button>
+        <div class="right">
+          <button type="button" class="mbtn cancel" id="cancelBtn">Cancel</button>
+          <button type="submit" class="mbtn save">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SHELF_COUNT = 12;
+  var BOOKS_PER_SHELF = 10;
+  var DB_NAME = "skiadRepoLibrary";
+  var STORE = "state";
+  var RECORD_KEY = "library";
+
+  var DEFAULT_GENRES = [
+    "Fiction", "Science", "History", "Technology", "Art & Design",
+    "Business", "Philosophy", "Biography", "Reference", "Poetry",
+    "Children's", "Archives"
+  ];
+
+  var COVER_COLORS = [
+    "#7a2e2e", "#2e5a45", "#233a63", "#8a5a1f", "#5a2e5f",
+    "#1f6b6b", "#5a3a22", "#6b1f3a", "#3a5a1f", "#3a3a5a",
+    "#8a3a1f", "#1f4a3a"
+  ];
+
+  var ICONS = {
+    repo: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>',
+    website: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 6 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-6-3.8-9s1.3-6.3 3.8-9z"/></svg>',
+    drive: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.1 2.6 1.6 14l3.5 6 6.5-11.4-3.5-6zm2.4 0 6.9 12H21l-3.5-6-3.4-6h-3.6zM5.6 21l3.5-6H21l-3.5 6H5.6z"/></svg>',
+    photo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5.5-5.5L9 17"/></svg>',
+    pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><text x="7.3" y="16" font-size="6" fill="currentColor" stroke="none" font-family="sans-serif" font-weight="700">PDF</text></svg>',
+    empty: '<span class="plus">+</span>'
+  };
+
+  var TYPE_LABELS = {
+    repo: "Repo", website: "Link", drive: "Drive", photo: "Photo", pdf: "PDF"
+  };
+
+  var db = null;
+  var state = null;
+  var editingId = null; // "s{shelfIdx}-b{bookIdx}"
+
+  /* ---------------- IndexedDB ---------------- */
+  function openDB(){
+    return new Promise(function(resolve, reject){
+      if (!window.indexedDB){ reject(new Error("no indexeddb")); return; }
+      var req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function(){
+        req.result.createObjectStore(STORE);
+      };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  }
+
+  function loadState(){
+    if (!db) return Promise.resolve(null);
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(STORE, "readonly");
+      var req = tx.objectStore(STORE).get(RECORD_KEY);
+      req.onsuccess = function(){ resolve(req.result || null); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  }
+
+  function saveState(){
+    setStatus("Saving…");
+    if (!db){ setStatus("Not saved (this browser has no local storage)."); return; }
+    var tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(state, RECORD_KEY);
+    tx.oncomplete = function(){ setStatus("Saved ✓"); setTimeout(function(){ setStatus(""); }, 1500); };
+    tx.onerror = function(){ setStatus("Could not save."); };
+  }
+
+  function setStatus(msg){
+    document.getElementById("saveStatus").textContent = msg;
+  }
+
+  /* ---------------- Default data ---------------- */
+  function makeDefaultState(){
+    var shelves = [];
+    for (var s = 0; s < SHELF_COUNT; s++){
+      var books = [];
+      for (var b = 0; b < BOOKS_PER_SHELF; b++){
+        books.push({
+          id: "s" + s + "-b" + b,
+          title: "Untitled " + (b + 1),
+          type: "empty",
+          url: "",
+          blob: null,
+          blobName: ""
+        });
+      }
+      shelves.push({
+        id: "shelf-" + s,
+        genre: DEFAULT_GENRES[s] || ("Shelf " + (s + 1)),
+        books: books
+      });
+    }
+    return { shelves: shelves };
+  }
+
+  /* ---------------- Rendering ---------------- */
+  var stacksEl = document.getElementById("stacks");
+
+  var GENRE_FONT = "700 16px Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif";
+  var GENRE_LETTER_SPACING_PX = 16 * 0.06; // matches .genre-title { letter-spacing: .06em } at 16px
+  var measureCanvas = null;
+  function measureTextWidth(text){
+    if (!measureCanvas) measureCanvas = document.createElement("canvas");
+    var ctx = measureCanvas.getContext("2d");
+    ctx.font = GENRE_FONT;
+    return ctx.measureText(text).width;
+  }
+  // Sizes a genre-title <input> to comfortably fit its own text (a long
+  // phrase like "Grand Secretary"), accounting for the uppercase transform
+  // and letter-spacing the CSS applies, instead of a rough ch-based guess.
+  function fitGenreInput(input){
+    var text = (input.value || input.placeholder || "").toUpperCase();
+    var textPx = measureTextWidth(text) + text.length * GENRE_LETTER_SPACING_PX;
+    input.style.width = Math.max(60, Math.ceil(textPx) + 18) + "px";
+  }
+
+  var BOOK_TITLE_MAX_FONT = 10.5;
+  var BOOK_TITLE_MIN_FONT = 7;
+  // Shrinks a book's title text to the largest font size that fits inside
+  // its fixed-height cover area, so titles display in full instead of
+  // being hard-clipped. Falls back to the box's own overflow:hidden clip
+  // at the smallest size if a title is simply too long to fit at all.
+  function fitBookTitle(el){
+    var font = BOOK_TITLE_MAX_FONT;
+    el.style.fontSize = font + "px";
+    while (el.scrollHeight > el.clientHeight + 1 && font > BOOK_TITLE_MIN_FONT){
+      font -= 0.5;
+      el.style.fontSize = font + "px";
+    }
+  }
+  function fitAllBookTitles(){
+    var titles = stacksEl.querySelectorAll(".book-title");
+    for (var i = 0; i < titles.length; i++) fitBookTitle(titles[i]);
+  }
+
+  function render(){
+    stacksEl.innerHTML = "";
+    state.shelves.forEach(function(shelf, sIdx){
+      var unit = document.createElement("section");
+      unit.className = "shelf-unit";
+
+      var header = document.createElement("div");
+      header.className = "shelf-header";
+      header.innerHTML =
+        '<span class="idx">' + (sIdx + 1) + '.</span>';
+      var title = document.createElement("input");
+      title.type = "text";
+      title.className = "genre-title";
+      title.value = shelf.genre;
+      title.maxLength = 60;
+      title.setAttribute("aria-label", "Shelf category title");
+      fitGenreInput(title);
+      title.addEventListener("input", function(){
+        fitGenreInput(title);
+      });
+      title.addEventListener("change", function(){
+        shelf.genre = title.value.trim() || ("Shelf " + (sIdx + 1));
+        title.value = shelf.genre;
+        fitGenreInput(title);
+        saveState();
+      });
+      header.appendChild(title);
+      var hint = document.createElement("span");
+      hint.className = "pencil-hint";
+      hint.textContent = "✎ category";
+      header.appendChild(hint);
+      unit.appendChild(header);
+
+      var body = document.createElement("div");
+      body.className = "shelf-body";
+
+      var row = document.createElement("div");
+      row.className = "books-row";
+      shelf.books.forEach(function(book, bIdx){
+        row.appendChild(renderBook(book, sIdx, bIdx));
+      });
+      body.appendChild(row);
+
+      var plank = document.createElement("div");
+      plank.className = "plank";
+      body.appendChild(plank);
+
+      unit.appendChild(body);
+      stacksEl.appendChild(unit);
+    });
+    fitAllBookTitles();
+  }
+
+  function renderBook(book, sIdx, bIdx){
+    var el = document.createElement("div");
+    el.className = "book" + (book.type === "empty" ? " empty" : "");
+    var color = COVER_COLORS[(sIdx + bIdx) % COVER_COLORS.length];
+    el.style.background = color;
+
+    if (book.type === "photo" && book.blob){
+      try {
+        var objUrl = URL.createObjectURL(book.blob);
+        el.style.backgroundImage =
+          "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.65)), url(" + objUrl + ")";
+      } catch(e){}
+    }
+
+    var iconWrap = document.createElement("div");
+    iconWrap.className = "cover-icon";
+    iconWrap.innerHTML = ICONS[book.type] || ICONS.empty;
+    el.appendChild(iconWrap);
+
+    var titleEl = document.createElement("div");
+    titleEl.className = "book-title";
+    titleEl.textContent = book.title;
+    el.appendChild(titleEl);
+
+    if (book.type !== "empty"){
+      el.classList.add("has-badge");
+      var badge = document.createElement("div");
+      badge.className = "type-badge";
+      badge.textContent = TYPE_LABELS[book.type] || "";
+      el.appendChild(badge);
+    }
+
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "edit-btn";
+    editBtn.setAttribute("aria-label", "Edit book");
+    editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+    editBtn.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      openEditor(book.id);
+    });
+    el.appendChild(editBtn);
+
+    el.addEventListener("click", function(){
+      if (book.type === "empty"){
+        openEditor(book.id);
+        return;
+      }
+      openBook(book);
+    });
+
+    return el;
+  }
+
+  function openBook(book){
+    if (book.type === "repo" || book.type === "website" || book.type === "drive"){
+      if (book.url) window.open(book.url, "_blank", "noopener");
+      else openEditor(book.id);
+      return;
+    }
+    if ((book.type === "photo" || book.type === "pdf") && book.blob){
+      var url = URL.createObjectURL(book.blob);
+      window.open(url, "_blank", "noopener");
+      return;
+    }
+    openEditor(book.id);
+  }
+
+  function findBook(id){
+    for (var s = 0; s < state.shelves.length; s++){
+      var shelf = state.shelves[s];
+      for (var b = 0; b < shelf.books.length; b++){
+        if (shelf.books[b].id === id) return shelf.books[b];
+      }
+    }
+    return null;
+  }
+
+  /* ---------------- Editor modal ---------------- */
+  var overlay = document.getElementById("modalOverlay");
+  var form = document.getElementById("editForm");
+  var fTitle = document.getElementById("f-title");
+  var fType = document.getElementById("f-type");
+  var fUrlField = document.getElementById("f-url-field");
+  var fUrlLabel = document.getElementById("f-url-label");
+  var fUrl = document.getElementById("f-url");
+  var fFileField = document.getElementById("f-file-field");
+  var fFileLabel = document.getElementById("f-file-label");
+  var fFile = document.getElementById("f-file");
+  var fCurrentFile = document.getElementById("f-current-file");
+  var pendingFile = null;
+
+  var URL_LABELS = {
+    repo: { label: "Repository URL", placeholder: "https://github.com/owner/repo" },
+    website: { label: "Website URL", placeholder: "https://example.com" },
+    drive: { label: "Google Drive / Photos link", placeholder: "https://drive.google.com/…" }
+  };
+  var FILE_LABELS = {
+    photo: { label: "Photo file", accept: "image/*" },
+    pdf: { label: "PDF file", accept: "application/pdf" }
+  };
+
+  function openEditor(id){
+    var book = findBook(id);
+    if (!book) return;
+    editingId = id;
+    pendingFile = null;
+    fTitle.value = book.title === ("Untitled " + (parseInt(id.split("-b")[1], 10) + 1)) ? "" : book.title;
+    fTitle.value = book.title;
+    fType.value = (book.type === "empty") ? "repo" : book.type;
+    updateFieldVisibility();
+    if (URL_LABELS[fType.value]) fUrl.value = book.url || "";
+    if (book.type === "photo" || book.type === "pdf"){
+      if (book.blobName){
+        fCurrentFile.style.display = "block";
+        fCurrentFile.textContent = "Current file: " + book.blobName;
+      } else {
+        fCurrentFile.style.display = "none";
+      }
+    } else {
+      fCurrentFile.style.display = "none";
+    }
+    document.getElementById("modalHeading").textContent =
+      "Edit “" + book.title + "”";
+    overlay.classList.add("open");
+    setTimeout(function(){ fTitle.focus(); }, 0);
+  }
+
+  function updateFieldVisibility(){
+    var t = fType.value;
+    if (URL_LABELS[t]){
+      fUrlField.style.display = "block";
+      fFileField.style.display = "none";
+      fUrlLabel.textContent = URL_LABELS[t].label;
+      fUrl.placeholder = URL_LABELS[t].placeholder;
+    } else if (FILE_LABELS[t]){
+      fUrlField.style.display = "none";
+      fFileField.style.display = "block";
+      fFileLabel.textContent = FILE_LABELS[t].label;
+      fFile.setAttribute("accept", FILE_LABELS[t].accept);
+    }
+  }
+  fType.addEventListener("change", updateFieldVisibility);
+
+  fFile.addEventListener("change", function(){
+    pendingFile = fFile.files && fFile.files[0] ? fFile.files[0] : null;
+  });
+
+  function closeEditor(){
+    overlay.classList.remove("open");
+    editingId = null;
+    pendingFile = null;
+    fFile.value = "";
+  }
+
+  document.getElementById("cancelBtn").addEventListener("click", closeEditor);
+  overlay.addEventListener("click", function(ev){
+    if (ev.target === overlay) closeEditor();
+  });
+  document.addEventListener("keydown", function(ev){
+    if (ev.key === "Escape" && overlay.classList.contains("open")) closeEditor();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    var book = findBook(editingId);
+    if (!book) return closeEditor();
+    var bIdx = parseInt(book.id.split("-b")[1], 10);
+    book.title = "Untitled " + (bIdx + 1);
+    book.type = "empty";
+    book.url = "";
+    book.blob = null;
+    book.blobName = "";
+    saveState();
+    render();
+    closeEditor();
+  });
+
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var book = findBook(editingId);
+    if (!book) return closeEditor();
+
+    var newTitle = fTitle.value.trim();
+    var newType = fType.value;
+
+    function finish(){
+      book.title = newTitle || book.title;
+      book.type = newType;
+      if (URL_LABELS[newType]){
+        book.url = fUrl.value.trim();
+        book.blob = null;
+        book.blobName = "";
+      } else if (FILE_LABELS[newType]){
+        book.url = "";
+        if (pendingFile){
+          book.blob = pendingFile;
+          book.blobName = pendingFile.name;
+        }
+      }
+      saveState();
+      render();
+      closeEditor();
+    }
+    finish();
+  });
+
+  /* ---------------- Reset ---------------- */
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if (!window.confirm("Reset the entire library? This clears every shelf title, book title, link and uploaded file in this browser.")) return;
+    state = makeDefaultState();
+    saveState();
+    render();
+  });
+
+  /* ---------------- Surveillance HUD (just for fun) ---------------- */
+  var SURVEILLANCE_KEY = "skiadRepoSurveillance";
+  var surveillanceOn = true;
+  try {
+    var savedSurveillance = localStorage.getItem(SURVEILLANCE_KEY);
+    if (savedSurveillance !== null) surveillanceOn = savedSurveillance === "1";
+  } catch (e) {}
+
+  function applySurveillance(){
+    var overlay = document.getElementById("spyOverlay");
+    var toggle = document.getElementById("surveillanceToggle");
+    if (overlay) overlay.style.display = surveillanceOn ? "block" : "none";
+    if (toggle) toggle.textContent = "🛰️ Surveillance: " + (surveillanceOn ? "ON" : "OFF");
+  }
+
+  var surveillanceToggleBtn = document.getElementById("surveillanceToggle");
+  if (surveillanceToggleBtn){
+    surveillanceToggleBtn.addEventListener("click", function(){
+      surveillanceOn = !surveillanceOn;
+      try { localStorage.setItem(SURVEILLANCE_KEY, surveillanceOn ? "1" : "0"); } catch (e) {}
+      applySurveillance();
+    });
+  }
+  applySurveillance();
+
+  // Scatter a handful of pulsing "contact" blips at random spots on the radar.
+  function initRadarBlips(){
+    var radar = document.getElementById("radarWidget");
+    if (!radar) return;
+    var count = 5;
+    for (var i = 0; i < count; i++){
+      var angle = Math.random() * Math.PI * 2;
+      var radius = 16 + Math.random() * 34; // % from center, stays within the rings
+      var blip = document.createElement("div");
+      blip.className = "radar-blip";
+      blip.style.left = (50 + Math.cos(angle) * radius) + "%";
+      blip.style.top = (50 + Math.sin(angle) * radius) + "%";
+      blip.style.animationDelay = (Math.random() * 2.6).toFixed(2) + "s";
+      radar.appendChild(blip);
+    }
+  }
+  initRadarBlips();
+
+  // A live UTC clock in the corner readout, just for atmosphere.
+  function updateHudClock(){
+    var el = document.getElementById("hudClock");
+    if (!el) return;
+    var now = new Date();
+    function pad(n){ return String(n).length < 2 ? "0" + n : String(n); }
+    el.textContent = pad(now.getUTCHours()) + ":" + pad(now.getUTCMinutes()) + ":" + pad(now.getUTCSeconds()) + " UTC";
+  }
+
+  // Reads the current hour/minute/second in a given IANA timezone.
+  function getZonedHMS(timeZone){
+    var parts;
+    try {
+      parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: timeZone, hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"
+      }).formatToParts(new Date());
+    } catch (e){
+      return null; // unsupported timezone in this browser
+    }
+    var h = 0, m = 0, s = 0;
+    parts.forEach(function(p){
+      if (p.type === "hour") h = parseInt(p.value, 10);
+      if (p.type === "minute") m = parseInt(p.value, 10);
+      if (p.type === "second") s = parseInt(p.value, 10);
+    });
+    return { h: h % 24, m: m, s: s };
+  }
+
+  // Ticks the four analog world clocks (Athens, Bogotá, São Paulo, London).
+  function updateWorldClocks(){
+    var clocks = document.querySelectorAll("#worldClocks .wclock");
+    clocks.forEach(function(clockEl){
+      var hms = getZonedHMS(clockEl.getAttribute("data-tz"));
+      if (!hms) return;
+      var hourAngle = ((hms.h % 12) + hms.m / 60) * 30;
+      var minAngle = (hms.m + hms.s / 60) * 6;
+      var secAngle = hms.s * 6;
+      var hourHand = clockEl.querySelector(".hand.hour");
+      var minHand = clockEl.querySelector(".hand.min");
+      var secHand = clockEl.querySelector(".hand.sec");
+      if (hourHand) hourHand.style.transform = "rotate(" + hourAngle + "deg)";
+      if (minHand) minHand.style.transform = "rotate(" + minAngle + "deg)";
+      if (secHand) secHand.style.transform = "rotate(" + secAngle + "deg)";
+    });
+  }
+
+  updateHudClock();
+  updateWorldClocks();
+  setInterval(function(){
+    updateHudClock();
+    updateWorldClocks();
+  }, 1000);
+
+  // "DARK WEB" monitor: a classic green matrix-style code rain, purely
+  // for hacker-movie atmosphere.
+  function initDarkWebMatrix(){
+    var canvas = document.getElementById("dwCanvas");
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext("2d");
+    var w = canvas.width, h = canvas.height;
+    var fontSize = 10;
+    var columns = Math.floor(w / fontSize);
+    var drops = [];
+    for (var i = 0; i < columns; i++) drops[i] = Math.random() * (h / fontSize);
+    var chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ$#%&@*<>/\\";
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, w, h);
+    setInterval(function(){
+      ctx.fillStyle = "rgba(0,0,0,.12)";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#4dff7a";
+      ctx.font = fontSize + "px monospace";
+      for (var col = 0; col < drops.length; col++){
+        var ch = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(ch, col * fontSize, drops[col] * fontSize);
+        if (drops[col] * fontSize > h && Math.random() > .975) drops[col] = 0;
+        drops[col]++;
+      }
+    }, 60);
+  }
+  initDarkWebMatrix();
+
+  /* ---------------- Boot ---------------- */
+  openDB().then(function(_db){
+    db = _db;
+    return loadState();
+  }).catch(function(){
+    return null;
+  }).then(function(loaded){
+    state = loaded || makeDefaultState();
+    if (!loaded) saveState();
+    render();
+  });
+
+})();
+</script>
+</body>
+</html>
