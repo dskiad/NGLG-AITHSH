@@ -112,6 +112,7 @@
   .shelf-header{
     display:flex;
     align-items:baseline;
+    flex-wrap:wrap;
     gap:8px;
     padding:0 6px 6px 2px;
   }
@@ -119,6 +120,7 @@
     font-size:11px;
     color:#8a7452;
     min-width:20px;
+    flex-shrink:0;
   }
   .genre-title{
     font-size:16px;
@@ -132,8 +134,9 @@
     cursor:text;
     border-bottom:1px dashed transparent;
     padding:1px 2px;
-    flex:0 1 auto;
+    flex:0 0 auto;
     min-width:60px;
+    max-width:80vw;
   }
   .genre-title:hover,.genre-title:focus{
     border-bottom-color:var(--gold);
@@ -491,6 +494,24 @@
   /* ---------------- Rendering ---------------- */
   var stacksEl = document.getElementById("stacks");
 
+  var GENRE_FONT = "700 16px Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif";
+  var GENRE_LETTER_SPACING_PX = 16 * 0.06; // matches .genre-title { letter-spacing: .06em } at 16px
+  var measureCanvas = null;
+  function measureTextWidth(text){
+    if (!measureCanvas) measureCanvas = document.createElement("canvas");
+    var ctx = measureCanvas.getContext("2d");
+    ctx.font = GENRE_FONT;
+    return ctx.measureText(text).width;
+  }
+  // Sizes a genre-title <input> to comfortably fit its own text (a long
+  // phrase like "Grand Secretary"), accounting for the uppercase transform
+  // and letter-spacing the CSS applies, instead of a rough ch-based guess.
+  function fitGenreInput(input){
+    var text = (input.value || input.placeholder || "").toUpperCase();
+    var textPx = measureTextWidth(text) + text.length * GENRE_LETTER_SPACING_PX;
+    input.style.width = Math.max(60, Math.ceil(textPx) + 18) + "px";
+  }
+
   function render(){
     stacksEl.innerHTML = "";
     state.shelves.forEach(function(shelf, sIdx){
@@ -505,16 +526,16 @@
       title.type = "text";
       title.className = "genre-title";
       title.value = shelf.genre;
-      title.maxLength = 40;
+      title.maxLength = 60;
       title.setAttribute("aria-label", "Shelf category title");
-      title.style.width = Math.max(6, shelf.genre.length) + "ch";
+      fitGenreInput(title);
       title.addEventListener("input", function(){
-        title.style.width = Math.max(6, title.value.length) + "ch";
+        fitGenreInput(title);
       });
       title.addEventListener("change", function(){
         shelf.genre = title.value.trim() || ("Shelf " + (sIdx + 1));
         title.value = shelf.genre;
-        title.style.width = Math.max(6, shelf.genre.length) + "ch";
+        fitGenreInput(title);
         saveState();
       });
       header.appendChild(title);
