@@ -459,11 +459,7 @@
   <!-- 8 GDPR -->
   <div class="card">
     <h3><span class="num">8</span>Προστασία Προσωπικών Δεδομένων (GDPR)</h3>
-    <div class="toggle-declar" id="gdprToggle">
-      <span>Προβολή πλήρους κειμένου ενημέρωσης</span>
-      <span class="chev">▾</span>
-    </div>
-    <div class="declar" id="gdprBox">
+    <div class="declar open" id="gdprBox">
       <p style="margin:0 0 8px;">Σύμφωνα με τον Γενικό Κανονισμό για την Προστασία Δεδομένων (ΕΕ) 2016/679 (GDPR) και τον Ν. 4624/2019, ενημερώνεστε ότι:</p>
       <ol>
         <li>Τα προσωπικά δεδομένα που δηλώνετε στην παρούσα αίτηση συλλέγονται και τυγχάνουν επεξεργασίας από την Εθνική Μεγάλη Στοά της Ελλάδος (και τη Στοά υποβολής) αποκλειστικά για τον σκοπό αξιολόγησης της αίτησης εισδοχής, υιοθεσίας ή επαναφοράς και, εφόσον γίνει δεκτή, για τη διαχείριση του μητρώου μελών.</li>
@@ -1129,12 +1125,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
   typeAdoption.addEventListener('change', syncType);
   typeEisdoxi.addEventListener('change', syncType);
   syncType();
-
-  const gdprToggle = $('gdprToggle'), gdprBox = $('gdprBox');
-  gdprToggle.addEventListener('click', ()=>{
-    gdprBox.classList.toggle('open');
-    gdprToggle.classList.toggle('open');
-  });
 
   // ---------- lodge directory (name, number, eparchia/region) ----------
   const LODGES = [
