@@ -342,6 +342,167 @@
   @media (max-width:480px){
     .book{width:70px;height:104px;}
   }
+
+  /* ================= Surveillance HUD overlay ==================
+     Purely decorative — a tongue-in-cheek "secret agency" layer over
+     the library. Everything in it is pointer-events:none so it never
+     blocks clicking shelves, books, or buttons underneath. */
+  :root{
+    --spy-green:#8dffb4;
+    --spy-green-dim:rgba(141,255,180,.35);
+    --spy-red:#ff5c5c;
+    --spy-font:ui-monospace,"SFMono-Regular","Courier New",Menlo,Consolas,monospace;
+  }
+  #spyOverlay{
+    position:fixed;
+    inset:0;
+    z-index:40;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  #spyOverlay .vignette{
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.35) 100%);
+  }
+  #spyOverlay .crt-scanlines{
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(to bottom,
+      rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+      var(--spy-green-dim) 3px, var(--spy-green-dim) 3px);
+    opacity:.12;
+    mix-blend-mode:screen;
+  }
+  #spyOverlay .scan-beam{
+    position:absolute;
+    left:0;right:0;top:-140px;
+    height:140px;
+    background:linear-gradient(to bottom,
+      rgba(141,255,180,0) 0%, rgba(141,255,180,.06) 45%,
+      rgba(141,255,180,.1) 50%, rgba(141,255,180,.06) 55%,
+      rgba(141,255,180,0) 100%);
+    animation:scanBeamMove 7s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes scanBeamMove{
+    0%{top:-140px;}
+    100%{top:100%;}
+  }
+
+  .hud-corner{
+    position:fixed;
+    width:26px;height:26px;
+    border-color:var(--spy-green-dim);
+    border-style:solid;
+    border-width:0;
+    filter:drop-shadow(0 0 4px rgba(141,255,180,.25));
+  }
+  .hud-corner.tl{top:10px;left:10px;border-top-width:2px;border-left-width:2px;}
+  .hud-corner.tr{top:10px;right:10px;border-top-width:2px;border-right-width:2px;}
+  .hud-corner.bl{bottom:10px;left:10px;border-bottom-width:2px;border-left-width:2px;}
+
+  .hud-rec{
+    position:fixed;
+    top:14px;right:44px;
+    font:700 10px/1 var(--spy-font);
+    color:var(--spy-red);
+    letter-spacing:.06em;
+    text-shadow:0 0 6px rgba(255,92,92,.6);
+    animation:recBlink 1.4s steps(1) infinite;
+  }
+  @keyframes recBlink{50%{opacity:.15;}}
+
+  .hud-readout{
+    position:fixed;
+    top:14px;left:44px;
+    font-family:var(--spy-font);
+    color:var(--spy-green);
+    text-shadow:0 0 6px rgba(141,255,180,.4);
+    line-height:1.4;
+  }
+  .hud-readout .clock{font-size:12px;font-weight:700;letter-spacing:.04em;}
+  .hud-readout .tag{font-size:9px;color:var(--spy-green-dim);letter-spacing:.03em;}
+
+  .hud-stamp{
+    position:fixed;
+    bottom:16px;left:44px;
+    transform:rotate(-8deg);
+    border:2px solid rgba(255,92,92,.65);
+    border-radius:4px;
+    padding:4px 8px;
+    font:700 10px/1.3 var(--spy-font);
+    letter-spacing:.05em;
+    color:rgba(255,92,92,.75);
+    text-align:center;
+    text-transform:uppercase;
+    opacity:.85;
+  }
+
+  .radar{
+    position:fixed;
+    bottom:18px;right:18px;
+    width:130px;height:130px;
+    border-radius:50%;
+    background:radial-gradient(circle at center,
+      rgba(20,45,28,.92) 0%, rgba(8,20,11,.96) 70%, rgba(3,9,4,1) 100%);
+    border:2px solid var(--spy-green-dim);
+    box-shadow:0 0 18px rgba(120,255,160,.3), inset 0 0 24px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .radar-rings,
+  .radar-rings::before,
+  .radar-rings::after{
+    border:1px solid var(--spy-green-dim);
+    border-radius:50%;
+  }
+  .radar-rings{position:absolute;inset:8%;}
+  .radar-rings::before{content:"";position:absolute;inset:25%;}
+  .radar-rings::after{content:"";position:absolute;inset:42%;}
+  .radar-cross{position:absolute;inset:0;}
+  .radar-cross::before,.radar-cross::after{
+    content:"";
+    position:absolute;
+    background:var(--spy-green-dim);
+  }
+  .radar-cross::before{left:6%;right:6%;top:50%;height:1px;}
+  .radar-cross::after{top:6%;bottom:6%;left:50%;width:1px;}
+  .radar-sweep{
+    position:absolute;inset:0;
+    border-radius:50%;
+    background:conic-gradient(from 0deg,
+      rgba(141,255,180,.55) 0deg, rgba(141,255,180,0) 60deg, rgba(141,255,180,0) 360deg);
+    animation:radarSweep 4s linear infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes radarSweep{to{transform:rotate(360deg);}}
+  .radar-blip{
+    position:absolute;
+    width:5px;height:5px;
+    margin:-2.5px 0 0 -2.5px;
+    border-radius:50%;
+    background:#c8ffdd;
+    box-shadow:0 0 6px 2px rgba(141,255,180,.8);
+    animation:blipPulse 2.6s ease-in-out infinite;
+  }
+  @keyframes blipPulse{
+    0%,100%{opacity:.15;transform:scale(.7);}
+    50%{opacity:1;transform:scale(1);}
+  }
+  .radar-label{
+    position:fixed;
+    bottom:150px;right:18px;
+    font:700 9px/1 var(--spy-font);
+    color:var(--spy-green);
+    letter-spacing:.06em;
+    text-align:right;
+    text-shadow:0 0 6px rgba(141,255,180,.4);
+  }
+
+  @media (max-width:600px){
+    .hud-readout,.hud-stamp,.hud-rec{display:none;}
+    .radar{width:96px;height:96px;bottom:12px;right:12px;}
+    .radar-label{bottom:112px;right:12px;}
+    .hud-corner{width:18px;height:18px;}
+  }
 </style>
 </head>
 <body>
@@ -352,6 +513,7 @@
   <p class="sub">A library of everything worth keeping — repositories, photos, PDFs, and links, shelved by category. Click any book to open it, click the pencil to edit it.</p>
   <div class="toolbar">
     <button class="btn subtle" id="resetBtn" type="button">Reset library</button>
+    <button class="btn subtle" id="surveillanceToggle" type="button">🛰️ Surveillance: ON</button>
   </div>
   <div id="saveStatus"></div>
 </header>
@@ -359,6 +521,28 @@
 <main class="stacks" id="stacks"></main>
 
 <footer>Skiad Repo — your edits are saved automatically in this browser.</footer>
+
+<!-- Surveillance HUD overlay — just for fun, purely decorative, click-through -->
+<div id="spyOverlay" aria-hidden="true">
+  <div class="vignette"></div>
+  <div class="crt-scanlines"></div>
+  <div class="scan-beam"></div>
+  <div class="hud-corner tl"></div>
+  <div class="hud-corner tr"></div>
+  <div class="hud-corner bl"></div>
+  <div class="hud-rec">● REC</div>
+  <div class="hud-readout">
+    <div class="clock" id="hudClock">00:00:00 UTC</div>
+    <div class="tag">SEC. CLEARANCE: OMEGA · GRID 41Q NQ 30412 70951</div>
+  </div>
+  <div class="hud-stamp">Top Secret<br>Skiad Eyes Only</div>
+  <div class="radar-label">SKIAD NET // SCANNING</div>
+  <div class="radar" id="radarWidget">
+    <div class="radar-rings"></div>
+    <div class="radar-cross"></div>
+    <div class="radar-sweep"></div>
+  </div>
+</div>
 
 <!-- Edit modal -->
 <div class="modal-overlay" id="modalOverlay">
@@ -805,6 +989,60 @@
     saveState();
     render();
   });
+
+  /* ---------------- Surveillance HUD (just for fun) ---------------- */
+  var SURVEILLANCE_KEY = "skiadRepoSurveillance";
+  var surveillanceOn = true;
+  try {
+    var savedSurveillance = localStorage.getItem(SURVEILLANCE_KEY);
+    if (savedSurveillance !== null) surveillanceOn = savedSurveillance === "1";
+  } catch (e) {}
+
+  function applySurveillance(){
+    var overlay = document.getElementById("spyOverlay");
+    var toggle = document.getElementById("surveillanceToggle");
+    if (overlay) overlay.style.display = surveillanceOn ? "block" : "none";
+    if (toggle) toggle.textContent = "🛰️ Surveillance: " + (surveillanceOn ? "ON" : "OFF");
+  }
+
+  var surveillanceToggleBtn = document.getElementById("surveillanceToggle");
+  if (surveillanceToggleBtn){
+    surveillanceToggleBtn.addEventListener("click", function(){
+      surveillanceOn = !surveillanceOn;
+      try { localStorage.setItem(SURVEILLANCE_KEY, surveillanceOn ? "1" : "0"); } catch (e) {}
+      applySurveillance();
+    });
+  }
+  applySurveillance();
+
+  // Scatter a handful of pulsing "contact" blips at random spots on the radar.
+  function initRadarBlips(){
+    var radar = document.getElementById("radarWidget");
+    if (!radar) return;
+    var count = 5;
+    for (var i = 0; i < count; i++){
+      var angle = Math.random() * Math.PI * 2;
+      var radius = 16 + Math.random() * 34; // % from center, stays within the rings
+      var blip = document.createElement("div");
+      blip.className = "radar-blip";
+      blip.style.left = (50 + Math.cos(angle) * radius) + "%";
+      blip.style.top = (50 + Math.sin(angle) * radius) + "%";
+      blip.style.animationDelay = (Math.random() * 2.6).toFixed(2) + "s";
+      radar.appendChild(blip);
+    }
+  }
+  initRadarBlips();
+
+  // A live UTC clock in the corner readout, just for atmosphere.
+  function updateHudClock(){
+    var el = document.getElementById("hudClock");
+    if (!el) return;
+    var now = new Date();
+    function pad(n){ return String(n).length < 2 ? "0" + n : String(n); }
+    el.textContent = pad(now.getUTCHours()) + ":" + pad(now.getUTCMinutes()) + ":" + pad(now.getUTCSeconds()) + " UTC";
+  }
+  updateHudClock();
+  setInterval(updateHudClock, 1000);
 
   /* ---------------- Boot ---------------- */
   openDB().then(function(_db){
