@@ -142,7 +142,7 @@
     padding:12px 14px;font-size:12px;line-height:1.65;color:#3A4356;
     max-height:0;overflow:hidden;transition:max-height .3s ease;
   }
-  .declar.open{max-height:900px;}
+  .declar.open{max-height:2200px;}
   .declar ol{margin:0;padding-left:18px;}
   .declar ol > li{margin-bottom:8px;}
   .declar ol ol{list-style:lower-alpha;margin-top:6px;}
@@ -557,9 +557,39 @@
     </div>
   </div>
 
-  <!-- 10 Date + signature -->
+  <!-- 10 GDPR notice & consent -->
   <div class="card">
-    <h3><span class="num">10</span>Ημερομηνία &amp; Υπογραφή</h3>
+    <h3><span class="num">10</span>Ενημέρωση &amp; Συγκατάθεση για την Επεξεργασία Δεδομένων Προσωπικού Χαρακτήρα</h3>
+    <div class="toggle-declar" id="gdprToggle">
+      <span>Προβολή πλήρους κειμένου ενημέρωσης (GDPR)</span>
+      <span class="chev">▾</span>
+    </div>
+    <div class="declar" id="gdprBox">
+      <p style="margin:0 0 8px;"><b>Υπεύθυνος Επεξεργασίας:</b> Εθνική Μεγάλη Στοά της Ελλάδος (Ε.Μ.Στ.Ε.), δια της Στοάς υποβολής και των κατά νόμο/κανονισμούς αρμοδίων οργάνων της (Σεβάσμιος, Γραμματέας, Συμβούλιο Στοάς, Μεγάλο Συμβούλιο). Στοιχεία επικοινωνίας για θέματα προστασίας δεδομένων: να συμπληρωθούν από την Ε.Μ.Στ.Ε. (υπεύθυνος/DPO, διεύθυνση, e-mail).</p>
+      <ol>
+        <li><b>Σκοπός επεξεργασίας:</b> αξιολόγηση της παρούσας αίτησης εισδοχής, υιοθεσίας ή επαναφοράς, έλεγχος των τυπικών και ουσιαστικών προϋποθέσεων που προβλέπουν οι Κανονισμοί της Ε.Μ.Στ.Ε., επικοινωνία με τον αιτούντα και, σε περίπτωση αποδοχής, τήρηση αρχείου μελών.</li>
+        <li><b>Νομική βάση:</b> άρθρο 6 παρ. 1(β) ΓΚΠΔ (ενέργειες κατόπιν αιτήματός σας πριν από ενδεχόμενη ένταξη), άρθρο 6 παρ. 1(στ) ΓΚΠΔ (έννομο συμφέρον της Ε.Μ.Στ.Ε. για την αξιολόγηση καταλληλότητας υποψηφίων μελών) και η ρητή συγκατάθεσή σας κατά το άρθρο 6 παρ. 1(α) ΓΚΠΔ, ιδίως για τα προαιρετικά στοιχεία (π.χ. φωτογραφία, ξένες γλώσσες) και για τις δηλώσεις της Ενότητας 9. Οι δηλώσεις αυτές —περί μη καταδίκης, πειθαρχικού ελέγχου ή εκκρεμούς δίκης— αποτελούν δεδομένα σχετικά με ποινικές καταδίκες/αδικήματα κατά την έννοια του άρθρου 10 ΓΚΠΔ και του άρθρου 11 του Ν. 4624/2019· υποβάλλονται αποκλειστικά ως δική σας οικειοθελής αυτοδήλωση, χωρίς η Ε.Μ.Στ.Ε. να αναζητά ή να λαμβάνει αντίγραφο ποινικού μητρώου, και χρησιμοποιούνται αποκλειστικά για τον σκοπό αξιολόγησης της παρούσας αίτησης.</li>
+        <li><b>Κατηγορίες δεδομένων:</b> στοιχεία ταυτότητας &amp; επικοινωνίας, στοιχεία κατοικίας, επαγγελματικά στοιχεία, οικογενειακή κατάσταση, φωτογραφία (προαιρετικά), ιδιόχειρη υπογραφή, καθώς και οι δηλώσεις των Ενοτήτων 7 έως 9.</li>
+        <li><b>Αποδέκτες:</b> αποκλειστικά τα αρμόδια όργανα της Στοάς υποβολής και, όπου απαιτείται από τη διαδικασία εισδοχής/υιοθεσίας/επαναφοράς, της Ε.Μ.Στ.Ε. Δεν διαβιβάζονται σε τρίτους, δεν χρησιμοποιούνται για εμπορικό ή διαφημιστικό σκοπό και δεν πραγματοποιείται αυτοματοποιημένη λήψη απόφασης ούτε κατάρτιση προφίλ.</li>
+        <li><b>Τρόπος υποβολής:</b> η παρούσα φόρμα λειτουργεί τοπικά στη συσκευή/στον browser σας και δημιουργεί το PDF της αίτησης χωρίς τα στοιχεία σας να αποστέλλονται σε διακομιστή τρίτου. Την επιλογή τρόπου διαβίβασης του τελικού PDF στη Στοά υποβολής (αυτοπροσώπως, με e-mail ή άλλο ασφαλή τρόπο) την κάνετε εσείς.</li>
+        <li><b>Χρόνος τήρησης:</b> για όσο διάστημα εξετάζεται η αίτησή σας και, σε περίπτωση αποδοχής, για όσο διατηρείτε την ιδιότητα μέλους και για το πρόσθετο διάστημα που επιβάλλουν οι εσωτερικοί Κανονισμοί ή ο νόμος· σε περίπτωση απόρριψης ή ανάκλησης της αίτησης, τα δεδομένα διαγράφονται/καταστρέφονται με ασφαλή τρόπο εντός εύλογου διαστήματος, εκτός αν άλλως ορίζει ο νόμος.</li>
+        <li><b>Δικαιώματά σας:</b> πρόσβασης, διόρθωσης, διαγραφής, περιορισμού της επεξεργασίας, εναντίωσης και φορητότητας των δεδομένων σας, καθώς και ανάκλησης της συγκατάθεσής σας ανά πάσα στιγμή, χωρίς να θίγεται η νομιμότητα της επεξεργασίας που έγινε πριν την ανάκληση. Για την άσκηση των δικαιωμάτων σας απευθυνθείτε στη Στοά υποβολής ή στα στοιχεία επικοινωνίας της Ε.Μ.Στ.Ε. ανωτέρω. Διατηρείτε δικαίωμα καταγγελίας στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).</li>
+        <li><b>Ασφάλεια:</b> η Ε.Μ.Στ.Ε. και η Στοά υποβολής λαμβάνουν κατάλληλα τεχνικά και οργανωτικά μέτρα για την προστασία των δεδομένων σας από μη εξουσιοδοτημένη πρόσβαση, απώλεια, διαρροή ή αλλοίωση.</li>
+      </ol>
+    </div>
+    <div class="check-row">
+      <input type="checkbox" id="gdprAccept" required>
+      <span>Έλαβα γνώση της ανωτέρω ενημέρωσης και <b>συναινώ ρητά</b> στην επεξεργασία, από την Εθνική Μεγάλη Στοά της Ελλάδος και τη Στοά υποβολής, των δεδομένων προσωπικού χαρακτήρα που δηλώνω στην παρούσα αίτηση —συμπεριλαμβανομένων των δηλώσεων της Ενότητας 9— αποκλειστικά για τον σκοπό αξιολόγησης της αίτησής μου εισδοχής/υιοθεσίας/επαναφοράς.</span>
+    </div>
+    <div class="check-row">
+      <input type="checkbox" id="gdprPhotoAccept">
+      <span>(Προαιρετικά) Συναινώ επιπλέον στην επεξεργασία της φωτογραφίας μου, εφόσον την έχω επισυνάψει στην Ενότητα 3.</span>
+    </div>
+  </div>
+
+  <!-- 11 Date + signature -->
+  <div class="card">
+    <h3><span class="num">11</span>Ημερομηνία &amp; Υπογραφή</h3>
     <div class="field">
       <label for="appDate">Ημερομηνία Αίτησης</label>
       <input type="date" id="appDate">
@@ -699,7 +729,8 @@
               <img id="p_photo" style="width:100%;height:100%;object-fit:cover;display:none;">
             </div>
 
-            <div class="dl" style="margin-bottom:10px;margin-right:104px;"><span>Αποδοχή δηλώσεων: <span id="p_declar"></span></span><span class="f"></span></div>
+            <div class="dl" style="margin-bottom:5px;margin-right:104px;"><span>Αποδοχή δηλώσεων: <span id="p_declar"></span></span><span class="f"></span></div>
+            <div class="dl" style="margin-bottom:10px;margin-right:104px;"><span>Συγκατάθεση GDPR: <span id="p_gdpr"></span></span><span class="f"></span></div>
 
             <div style="font-weight:bold;font-size:9.6px;margin-bottom:5px;margin-top:14px;">ΕΙΔΟΣ ΑΙΤΗΣΗΣ</div>
             <div class="dl" style="margin-bottom:14px;margin-right:104px;"><span><span id="p_type"></span></span><span class="f"></span></div>
@@ -1245,6 +1276,12 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     declarToggle.classList.toggle('open');
   });
 
+  const gdprToggle = $('gdprToggle'), gdprBox = $('gdprBox');
+  gdprToggle.addEventListener('click', ()=>{
+    gdprBox.classList.toggle('open');
+    gdprToggle.classList.toggle('open');
+  });
+
   // ---------- lodge directory (name, number, eparchia/region) ----------
   const LODGES = [
 {n:'BENEFICENZA',no:'53',e:'ΙΟΝΙΩΝ ΝΗΣΩΝ'},
@@ -1554,6 +1591,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       $('emailErr').style.display = 'block';
     }
     if(!$('declarAccept').checked) errors.push('Η αποδοχή των δηλώσεων υποψηφίου');
+    if(!$('gdprAccept').checked) errors.push('Η συγκατάθεση για την επεξεργασία προσωπικών δεδομένων (GDPR)');
     if(!hasSignature) errors.push('Η ιδιόχειρη υπογραφή');
     return errors;
   }
@@ -1623,6 +1661,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     $('p_proposedStoa').textContent = proposedYes.checked ? val('proposedStoa') : '—';
 
     $('p_declar').textContent = $('declarAccept').checked ? 'ΝΑΙ — αποδεκτές' : 'ΟΧΙ';
+    $('p_gdpr').textContent = $('gdprAccept').checked ? 'ΝΑΙ — ρητή συγκατάθεση' : 'ΟΧΙ';
     $('p_type').textContent = typeAdoption.checked ? 'Υιοθεσία / Επαναφορά' : 'Εισδοχή (νέο μέλος)';
 
     const isAdopt = typeAdoption.checked;
@@ -1857,7 +1896,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     'dateEtairos','dateDidaskalos','periodSev','periodEp','appDate',
     'gennisiDay','gennisiMonth','gennisiYear','stoaPicker'
   ];
-  const DRAFT_CHECK_IDS = ['stoaUnknown','diplomaCheck','declarAccept'];
+  const DRAFT_CHECK_IDS = ['stoaUnknown','diplomaCheck','declarAccept','gdprAccept','gdprPhotoAccept'];
   const DRAFT_RADIO_GROUPS = { appType: ['typeEisdoxi','typeAdoption'], proposed: ['proposedNo','proposedYes'] };
 
   function collectDraft(){
