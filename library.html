@@ -207,15 +207,18 @@
     color:#fff;
     text-align:center;
     text-shadow:0 1px 3px rgba(0,0,0,.6);
-    display:-webkit-box;
-    -webkit-line-clamp:4;
-    -webkit-box-orient:vertical;
     overflow:hidden;
+    overflow-wrap:break-word;
+    word-break:break-word;
     width:100%;
+    max-height:52px;
+  }
+  .book.has-badge{
+    padding-bottom:16px;
   }
   .book .type-badge{
     position:absolute;
-    bottom:4px;
+    bottom:3px;
     right:4px;
     font-size:8px;
     letter-spacing:.03em;
@@ -512,6 +515,25 @@
     input.style.width = Math.max(60, Math.ceil(textPx) + 18) + "px";
   }
 
+  var BOOK_TITLE_MAX_FONT = 10.5;
+  var BOOK_TITLE_MIN_FONT = 7;
+  // Shrinks a book's title text to the largest font size that fits inside
+  // its fixed-height cover area, so titles display in full instead of
+  // being hard-clipped. Falls back to the box's own overflow:hidden clip
+  // at the smallest size if a title is simply too long to fit at all.
+  function fitBookTitle(el){
+    var font = BOOK_TITLE_MAX_FONT;
+    el.style.fontSize = font + "px";
+    while (el.scrollHeight > el.clientHeight + 1 && font > BOOK_TITLE_MIN_FONT){
+      font -= 0.5;
+      el.style.fontSize = font + "px";
+    }
+  }
+  function fitAllBookTitles(){
+    var titles = stacksEl.querySelectorAll(".book-title");
+    for (var i = 0; i < titles.length; i++) fitBookTitle(titles[i]);
+  }
+
   function render(){
     stacksEl.innerHTML = "";
     state.shelves.forEach(function(shelf, sIdx){
@@ -562,6 +584,7 @@
       unit.appendChild(body);
       stacksEl.appendChild(unit);
     });
+    fitAllBookTitles();
   }
 
   function renderBook(book, sIdx, bIdx){
@@ -589,6 +612,7 @@
     el.appendChild(titleEl);
 
     if (book.type !== "empty"){
+      el.classList.add("has-badge");
       var badge = document.createElement("div");
       badge.className = "type-badge";
       badge.textContent = TYPE_LABELS[book.type] || "";
