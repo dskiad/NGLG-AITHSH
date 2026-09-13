@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Skiad Repo</title>
+<style>
+  :root{
+    --wood-dark:#2b1b12;
+    --wood:#3d2817;
+    --wood-light:#5a3a22;
+    --plank:#6b4423;
+    --plank-edge:#4a2f18;
+    --gold:#d9a94d;
+    --gold-light:#f0cd8a;
+    --cream:#f4ead6;
+    --ink:#241608;
+    --panel:#efe4cd;
+    --panel-line:#cbb98b;
+    --danger:#b3261e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top, rgba(255,215,140,.08), transparent 60%),
+      linear-gradient(180deg, var(--wood-dark) 0%, #1c1108 100%);
+    font-family:Georgia,"Iowan Old Style","Palatino Linotype",Palatino,serif;
+    color:var(--cream);
+    padding-bottom:60px;
+  }
+
+  /* ---------- Header ---------- */
+  header.hero{
+    text-align:center;
+    padding:38px 16px 22px;
+    background:linear-gradient(180deg, rgba(0,0,0,.35), transparent);
+    border-bottom:1px solid rgba(217,169,77,.25);
+  }
+  header.hero .crest{
+    width:46px;height:46px;margin:0 auto 10px;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold);
+    font-size:20px;
+  }
+  header.hero h1{
+    margin:0;
+    font-size:clamp(28px,6vw,44px);
+    letter-spacing:.04em;
+    color:var(--gold-light);
+    text-shadow:0 2px 10px rgba(0,0,0,.5);
+  }
+  header.hero p.sub{
+    margin:8px auto 0;
+    max-width:560px;
+    font-size:14px;
+    color:#cbb98b;
+    letter-spacing:.02em;
+    line-height:1.5;
+  }
+  header.hero .toolbar{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:13px;
+    letter-spacing:.03em;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid var(--gold);
+    background:transparent;
+    color:var(--gold-light);
+    cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .btn:hover{background:var(--gold);color:var(--wood-dark);}
+  .btn.subtle{
+    border-color:rgba(217,169,77,.4);
+    color:#cbb98b;
+    font-size:12px;
+  }
+  .btn.subtle:hover{background:rgba(217,169,77,.15);color:var(--gold-light);}
+  .btn.danger{border-color:#c96a5f;color:#e8a99f;}
+  .btn.danger:hover{background:#c96a5f;color:#2b1b12;}
+  #saveStatus{
+    font-size:11px;
+    color:#9c8a63;
+    text-align:center;
+    margin-top:10px;
+    min-height:14px;
+  }
+
+  /* ---------- Shelves ---------- */
+  .stacks{
+    max-width:1180px;
+    margin:0 auto;
+    padding:26px 14px 0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .shelf-unit{
+    position:relative;
+  }
+  .shelf-header{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:0 6px 6px 2px;
+  }
+  .shelf-header .idx{
+    font-size:11px;
+    color:#8a7452;
+    min-width:20px;
+  }
+  .genre-title{
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    border:none;
+    background:transparent;
+    outline:none;
+    cursor:text;
+    border-bottom:1px dashed transparent;
+    padding:1px 2px;
+    flex:0 1 auto;
+    min-width:60px;
+  }
+  .genre-title:hover,.genre-title:focus{
+    border-bottom-color:var(--gold);
+  }
+  .shelf-header .pencil-hint{
+    color:#7a6544;
+    font-size:11px;
+  }
+
+  .shelf-body{
+    position:relative;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,.28), transparent 30%),
+      repeating-linear-gradient(90deg, var(--wood) 0 3px, var(--wood-light) 3px 6px);
+    border-radius:6px 6px 2px 2px;
+    padding:14px 10px 0;
+    box-shadow:inset 0 0 24px rgba(0,0,0,.35);
+  }
+  .books-row{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:12px;
+    scrollbar-width:thin;
+  }
+  .plank{
+    height:16px;
+    background:linear-gradient(180deg, var(--plank) 0%, var(--plank-edge) 100%);
+    border-radius:0 0 5px 5px;
+    box-shadow:0 6px 10px -4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  /* ---------- Book cover ---------- */
+  .book{
+    position:relative;
+    flex:0 0 auto;
+    width:78px;
+    height:112px;
+    border-radius:4px 6px 6px 4px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    padding:6px 5px;
+    cursor:pointer;
+    box-shadow:
+      2px 3px 6px rgba(0,0,0,.45),
+      inset -3px 0 0 rgba(0,0,0,.25),
+      inset 2px 0 0 rgba(255,255,255,.08);
+    background-size:cover;
+    background-position:center;
+    transition:transform .12s ease;
+    border:1px solid rgba(0,0,0,.3);
+  }
+  .book:hover{transform:translateY(-6px);}
+  .book .cover-icon{
+    width:22px;height:22px;
+    margin-bottom:auto;
+    margin-top:2px;
+    opacity:.9;
+    color:#fff;
+  }
+  .book .cover-icon svg{width:100%;height:100%;display:block;}
+  .book .book-title{
+    font-size:10.5px;
+    line-height:1.2;
+    font-weight:700;
+    color:#fff;
+    text-align:center;
+    text-shadow:0 1px 3px rgba(0,0,0,.6);
+    display:-webkit-box;
+    -webkit-line-clamp:4;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+    width:100%;
+  }
+  .book .type-badge{
+    position:absolute;
+    bottom:4px;
+    right:4px;
+    font-size:8px;
+    letter-spacing:.03em;
+    background:rgba(0,0,0,.45);
+    color:#fff;
+    padding:1px 4px;
+    border-radius:3px;
+    text-transform:uppercase;
+  }
+  .book.empty{
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 8px, rgba(255,255,255,.01) 8px 16px);
+    border:1px dashed rgba(217,169,77,.4);
+    justify-content:center;
+  }
+  .book.empty .plus{
+    font-size:22px;
+    color:var(--gold);
+    line-height:1;
+  }
+  .book.empty .book-title{
+    color:#b39f78;
+    margin-top:4px;
+    font-weight:600;
+  }
+  .book .edit-btn{
+    position:absolute;
+    top:3px;right:3px;
+    width:19px;height:19px;
+    border-radius:50%;
+    background:rgba(20,12,6,.65);
+    border:1px solid rgba(255,255,255,.25);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    padding:0;
+  }
+  .book .edit-btn svg{width:11px;height:11px;}
+  .book .edit-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--wood-dark);}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(10,6,2,.7);
+    display:none;
+    align-items:center;justify-content:center;
+    padding:16px;
+    z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);
+    color:var(--ink);
+    width:100%;max-width:380px;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  }
+  .modal h3{
+    margin:0 0 14px;
+    font-family:Georgia,serif;
+    font-size:18px;
+    color:#3d2817;
+  }
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;font-size:11px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.04em;
+    color:#6b5636;margin-bottom:4px;
+  }
+  .field input[type=text],
+  .field input[type=url],
+  .field select{
+    width:100%;
+    padding:8px 10px;
+    border:1px solid var(--panel-line);
+    border-radius:6px;
+    font-size:14px;
+    background:#fff;
+    font-family:inherit;
+  }
+  .field input[type=file]{
+    font-size:12px;width:100%;
+  }
+  .field .hint{font-size:11px;color:#7a6544;margin-top:4px;}
+  .current-file{
+    font-size:12px;color:#3d2817;background:#e4d6b3;
+    padding:6px 8px;border-radius:6px;margin-top:6px;
+    word-break:break-all;
+  }
+  .modal-actions{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:18px;gap:8px;flex-wrap:wrap;
+  }
+  .modal-actions .right{display:flex;gap:8px;}
+  .mbtn{
+    font-family:inherit;font-size:13px;
+    padding:8px 14px;border-radius:6px;border:1px solid transparent;
+    cursor:pointer;
+  }
+  .mbtn.save{background:#3d2817;color:#f0cd8a;}
+  .mbtn.save:hover{background:#2b1b12;}
+  .mbtn.cancel{background:transparent;color:#6b5636;border-color:#cbb98b;}
+  .mbtn.cancel:hover{background:#e4d6b3;}
+  .mbtn.clear{background:transparent;color:#b3261e;border-color:#e2b3ae;}
+  .mbtn.clear:hover{background:#f6e2df;}
+
+  footer{
+    text-align:center;
+    color:#7a6544;
+    font-size:11px;
+    margin-top:36px;
+    padding:0 16px;
+  }
+
+  @media (max-width:480px){
+    .book{width:70px;height:104px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="crest">☙</div>
+  <h1>Skiad Repo</h1>
+  <p class="sub">A library of everything worth keeping — repositories, photos, PDFs, and links, shelved by category. Click any book to open it, click the pencil to edit it.</p>
+  <div class="toolbar">
+    <button class="btn subtle" id="resetBtn" type="button">Reset library</button>
+  </div>
+  <div id="saveStatus"></div>
+</header>
+
+<main class="stacks" id="stacks"></main>
+
+<footer>Skiad Repo — your edits are saved automatically in this browser.</footer>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3 id="modalHeading">Edit book</h3>
+    <form id="editForm">
+      <div class="field">
+        <label for="f-title">Title</label>
+        <input type="text" id="f-title" maxlength="80" required>
+      </div>
+      <div class="field">
+        <label for="f-type">Opens</label>
+        <select id="f-type">
+          <option value="repo">GitHub / code repository</option>
+          <option value="website">Website link</option>
+          <option value="drive">Google Drive / Google Photos link</option>
+          <option value="photo">Uploaded photo</option>
+          <option value="pdf">Uploaded PDF</option>
+        </select>
+      </div>
+      <div class="field" id="f-url-field">
+        <label id="f-url-label" for="f-url">Repository URL</label>
+        <input type="url" id="f-url" placeholder="https://github.com/owner/repo">
+      </div>
+      <div class="field" id="f-file-field" style="display:none;">
+        <label id="f-file-label" for="f-file">Photo file</label>
+        <input type="file" id="f-file">
+        <div class="hint">Stored locally in this browser (IndexedDB).</div>
+        <div class="current-file" id="f-current-file" style="display:none;"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="mbtn clear" id="clearBtn">Clear book</button>
+        <div class="right">
+          <button type="button" class="mbtn cancel" id="cancelBtn">Cancel</button>
+          <button type="submit" class="mbtn save">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var SHELF_COUNT = 12;
+  var BOOKS_PER_SHELF = 10;
+  var DB_NAME = "skiadRepoLibrary";
+  var STORE = "state";
+  var RECORD_KEY = "library";
+
+  var DEFAULT_GENRES = [
+    "Fiction", "Science", "History", "Technology", "Art & Design",
+    "Business", "Philosophy", "Biography", "Reference", "Poetry",
+    "Children's", "Archives"
+  ];
+
+  var COVER_COLORS = [
+    "#7a2e2e", "#2e5a45", "#233a63", "#8a5a1f", "#5a2e5f",
+    "#1f6b6b", "#5a3a22", "#6b1f3a", "#3a5a1f", "#3a3a5a",
+    "#8a3a1f", "#1f4a3a"
+  ];
+
+  var ICONS = {
+    repo: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>',
+    website: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 6 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-6-3.8-9s1.3-6.3 3.8-9z"/></svg>',
+    drive: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.1 2.6 1.6 14l3.5 6 6.5-11.4-3.5-6zm2.4 0 6.9 12H21l-3.5-6-3.4-6h-3.6zM5.6 21l3.5-6H21l-3.5 6H5.6z"/></svg>',
+    photo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor" stroke="none"/><path d="M21 16l-5.5-5.5L9 17"/></svg>',
+    pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><text x="7.3" y="16" font-size="6" fill="currentColor" stroke="none" font-family="sans-serif" font-weight="700">PDF</text></svg>',
+    empty: '<span class="plus">+</span>'
+  };
+
+  var TYPE_LABELS = {
+    repo: "Repo", website: "Link", drive: "Drive", photo: "Photo", pdf: "PDF"
+  };
+
+  var db = null;
+  var state = null;
+  var editingId = null; // "s{shelfIdx}-b{bookIdx}"
+
+  /* ---------------- IndexedDB ---------------- */
+  function openDB(){
+    return new Promise(function(resolve, reject){
+      if (!window.indexedDB){ reject(new Error("no indexeddb")); return; }
+      var req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = function(){
+        req.result.createObjectStore(STORE);
+      };
+      req.onsuccess = function(){ resolve(req.result); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  }
+
+  function loadState(){
+    if (!db) return Promise.resolve(null);
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(STORE, "readonly");
+      var req = tx.objectStore(STORE).get(RECORD_KEY);
+      req.onsuccess = function(){ resolve(req.result || null); };
+      req.onerror = function(){ reject(req.error); };
+    });
+  }
+
+  function saveState(){
+    setStatus("Saving…");
+    if (!db){ setStatus("Not saved (this browser has no local storage)."); return; }
+    var tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).put(state, RECORD_KEY);
+    tx.oncomplete = function(){ setStatus("Saved ✓"); setTimeout(function(){ setStatus(""); }, 1500); };
+    tx.onerror = function(){ setStatus("Could not save."); };
+  }
+
+  function setStatus(msg){
+    document.getElementById("saveStatus").textContent = msg;
+  }
+
+  /* ---------------- Default data ---------------- */
+  function makeDefaultState(){
+    var shelves = [];
+    for (var s = 0; s < SHELF_COUNT; s++){
+      var books = [];
+      for (var b = 0; b < BOOKS_PER_SHELF; b++){
+        books.push({
+          id: "s" + s + "-b" + b,
+          title: "Untitled " + (b + 1),
+          type: "empty",
+          url: "",
+          blob: null,
+          blobName: ""
+        });
+      }
+      shelves.push({
+        id: "shelf-" + s,
+        genre: DEFAULT_GENRES[s] || ("Shelf " + (s + 1)),
+        books: books
+      });
+    }
+    return { shelves: shelves };
+  }
+
+  /* ---------------- Rendering ---------------- */
+  var stacksEl = document.getElementById("stacks");
+
+  function render(){
+    stacksEl.innerHTML = "";
+    state.shelves.forEach(function(shelf, sIdx){
+      var unit = document.createElement("section");
+      unit.className = "shelf-unit";
+
+      var header = document.createElement("div");
+      header.className = "shelf-header";
+      header.innerHTML =
+        '<span class="idx">' + (sIdx + 1) + '.</span>';
+      var title = document.createElement("input");
+      title.type = "text";
+      title.className = "genre-title";
+      title.value = shelf.genre;
+      title.maxLength = 40;
+      title.setAttribute("aria-label", "Shelf category title");
+      title.style.width = Math.max(6, shelf.genre.length) + "ch";
+      title.addEventListener("input", function(){
+        title.style.width = Math.max(6, title.value.length) + "ch";
+      });
+      title.addEventListener("change", function(){
+        shelf.genre = title.value.trim() || ("Shelf " + (sIdx + 1));
+        title.value = shelf.genre;
+        title.style.width = Math.max(6, shelf.genre.length) + "ch";
+        saveState();
+      });
+      header.appendChild(title);
+      var hint = document.createElement("span");
+      hint.className = "pencil-hint";
+      hint.textContent = "✎ category";
+      header.appendChild(hint);
+      unit.appendChild(header);
+
+      var body = document.createElement("div");
+      body.className = "shelf-body";
+
+      var row = document.createElement("div");
+      row.className = "books-row";
+      shelf.books.forEach(function(book, bIdx){
+        row.appendChild(renderBook(book, sIdx, bIdx));
+      });
+      body.appendChild(row);
+
+      var plank = document.createElement("div");
+      plank.className = "plank";
+      body.appendChild(plank);
+
+      unit.appendChild(body);
+      stacksEl.appendChild(unit);
+    });
+  }
+
+  function renderBook(book, sIdx, bIdx){
+    var el = document.createElement("div");
+    el.className = "book" + (book.type === "empty" ? " empty" : "");
+    var color = COVER_COLORS[(sIdx + bIdx) % COVER_COLORS.length];
+    el.style.background = color;
+
+    if (book.type === "photo" && book.blob){
+      try {
+        var objUrl = URL.createObjectURL(book.blob);
+        el.style.backgroundImage =
+          "linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.65)), url(" + objUrl + ")";
+      } catch(e){}
+    }
+
+    var iconWrap = document.createElement("div");
+    iconWrap.className = "cover-icon";
+    iconWrap.innerHTML = ICONS[book.type] || ICONS.empty;
+    el.appendChild(iconWrap);
+
+    var titleEl = document.createElement("div");
+    titleEl.className = "book-title";
+    titleEl.textContent = book.title;
+    el.appendChild(titleEl);
+
+    if (book.type !== "empty"){
+      var badge = document.createElement("div");
+      badge.className = "type-badge";
+      badge.textContent = TYPE_LABELS[book.type] || "";
+      el.appendChild(badge);
+    }
+
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "edit-btn";
+    editBtn.setAttribute("aria-label", "Edit book");
+    editBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+    editBtn.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      openEditor(book.id);
+    });
+    el.appendChild(editBtn);
+
+    el.addEventListener("click", function(){
+      if (book.type === "empty"){
+        openEditor(book.id);
+        return;
+      }
+      openBook(book);
+    });
+
+    return el;
+  }
+
+  function openBook(book){
+    if (book.type === "repo" || book.type === "website" || book.type === "drive"){
+      if (book.url) window.open(book.url, "_blank", "noopener");
+      else openEditor(book.id);
+      return;
+    }
+    if ((book.type === "photo" || book.type === "pdf") && book.blob){
+      var url = URL.createObjectURL(book.blob);
+      window.open(url, "_blank", "noopener");
+      return;
+    }
+    openEditor(book.id);
+  }
+
+  function findBook(id){
+    for (var s = 0; s < state.shelves.length; s++){
+      var shelf = state.shelves[s];
+      for (var b = 0; b < shelf.books.length; b++){
+        if (shelf.books[b].id === id) return shelf.books[b];
+      }
+    }
+    return null;
+  }
+
+  /* ---------------- Editor modal ---------------- */
+  var overlay = document.getElementById("modalOverlay");
+  var form = document.getElementById("editForm");
+  var fTitle = document.getElementById("f-title");
+  var fType = document.getElementById("f-type");
+  var fUrlField = document.getElementById("f-url-field");
+  var fUrlLabel = document.getElementById("f-url-label");
+  var fUrl = document.getElementById("f-url");
+  var fFileField = document.getElementById("f-file-field");
+  var fFileLabel = document.getElementById("f-file-label");
+  var fFile = document.getElementById("f-file");
+  var fCurrentFile = document.getElementById("f-current-file");
+  var pendingFile = null;
+
+  var URL_LABELS = {
+    repo: { label: "Repository URL", placeholder: "https://github.com/owner/repo" },
+    website: { label: "Website URL", placeholder: "https://example.com" },
+    drive: { label: "Google Drive / Photos link", placeholder: "https://drive.google.com/…" }
+  };
+  var FILE_LABELS = {
+    photo: { label: "Photo file", accept: "image/*" },
+    pdf: { label: "PDF file", accept: "application/pdf" }
+  };
+
+  function openEditor(id){
+    var book = findBook(id);
+    if (!book) return;
+    editingId = id;
+    pendingFile = null;
+    fTitle.value = book.title === ("Untitled " + (parseInt(id.split("-b")[1], 10) + 1)) ? "" : book.title;
+    fTitle.value = book.title;
+    fType.value = (book.type === "empty") ? "repo" : book.type;
+    updateFieldVisibility();
+    if (URL_LABELS[fType.value]) fUrl.value = book.url || "";
+    if (book.type === "photo" || book.type === "pdf"){
+      if (book.blobName){
+        fCurrentFile.style.display = "block";
+        fCurrentFile.textContent = "Current file: " + book.blobName;
+      } else {
+        fCurrentFile.style.display = "none";
+      }
+    } else {
+      fCurrentFile.style.display = "none";
+    }
+    document.getElementById("modalHeading").textContent =
+      "Edit “" + book.title + "”";
+    overlay.classList.add("open");
+    setTimeout(function(){ fTitle.focus(); }, 0);
+  }
+
+  function updateFieldVisibility(){
+    var t = fType.value;
+    if (URL_LABELS[t]){
+      fUrlField.style.display = "block";
+      fFileField.style.display = "none";
+      fUrlLabel.textContent = URL_LABELS[t].label;
+      fUrl.placeholder = URL_LABELS[t].placeholder;
+    } else if (FILE_LABELS[t]){
+      fUrlField.style.display = "none";
+      fFileField.style.display = "block";
+      fFileLabel.textContent = FILE_LABELS[t].label;
+      fFile.setAttribute("accept", FILE_LABELS[t].accept);
+    }
+  }
+  fType.addEventListener("change", updateFieldVisibility);
+
+  fFile.addEventListener("change", function(){
+    pendingFile = fFile.files && fFile.files[0] ? fFile.files[0] : null;
+  });
+
+  function closeEditor(){
+    overlay.classList.remove("open");
+    editingId = null;
+    pendingFile = null;
+    fFile.value = "";
+  }
+
+  document.getElementById("cancelBtn").addEventListener("click", closeEditor);
+  overlay.addEventListener("click", function(ev){
+    if (ev.target === overlay) closeEditor();
+  });
+  document.addEventListener("keydown", function(ev){
+    if (ev.key === "Escape" && overlay.classList.contains("open")) closeEditor();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    var book = findBook(editingId);
+    if (!book) return closeEditor();
+    var bIdx = parseInt(book.id.split("-b")[1], 10);
+    book.title = "Untitled " + (bIdx + 1);
+    book.type = "empty";
+    book.url = "";
+    book.blob = null;
+    book.blobName = "";
+    saveState();
+    render();
+    closeEditor();
+  });
+
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var book = findBook(editingId);
+    if (!book) return closeEditor();
+
+    var newTitle = fTitle.value.trim();
+    var newType = fType.value;
+
+    function finish(){
+      book.title = newTitle || book.title;
+      book.type = newType;
+      if (URL_LABELS[newType]){
+        book.url = fUrl.value.trim();
+        book.blob = null;
+        book.blobName = "";
+      } else if (FILE_LABELS[newType]){
+        book.url = "";
+        if (pendingFile){
+          book.blob = pendingFile;
+          book.blobName = pendingFile.name;
+        }
+      }
+      saveState();
+      render();
+      closeEditor();
+    }
+    finish();
+  });
+
+  /* ---------------- Reset ---------------- */
+  document.getElementById("resetBtn").addEventListener("click", function(){
+    if (!window.confirm("Reset the entire library? This clears every shelf title, book title, link and uploaded file in this browser.")) return;
+    state = makeDefaultState();
+    saveState();
+    render();
+  });
+
+  /* ---------------- Boot ---------------- */
+  openDB().then(function(_db){
+    db = _db;
+    return loadState();
+  }).catch(function(){
+    return null;
+  }).then(function(loaded){
+    state = loaded || makeDefaultState();
+    if (!loaded) saveState();
+    render();
+  });
+
+})();
+</script>
+</body>
+</html>
