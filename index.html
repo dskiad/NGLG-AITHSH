@@ -552,18 +552,18 @@
 
         <div>
           <div style="position:relative;">
-            <div style="position:absolute;top:0;right:0;width:92px;height:118px;border:1px solid #D8BE7C;border-radius:4px;overflow:hidden;background:#FAF7F0;">
+            <div style="position:absolute;top:0;right:0;width:100px;height:200px;border:1px solid #D8BE7C;border-radius:4px;overflow:hidden;background:#FAF7F0;">
               <img id="p_photo" style="width:100%;height:100%;object-fit:cover;display:none;">
             </div>
 
             <div class="pdcap" style="margin-top:0;">Στοιχεία Ταυτότητας</div>
-            <div class="dl pd" style="margin:0 100px 4px 0;"><span><b>Επώνυμο:</b> <span id="p_eponymo"></span></span><span class="f"></span></div>
-            <div class="dl pd" style="margin:0 100px 4px 0;"><span><b>Όνομα:</b> <span id="p_onoma"></span></span><span class="f"></span></div>
-            <div class="dl pd" style="margin:0 100px 4px 0;"><span><b>Πατρώνυμο:</b> <span id="p_patronymo"></span></span><span class="f"></span></div>
-            <div class="dl pd" style="margin:0 100px 4px 0;"><span><b>Ημ. Γέννησης:</b> <span id="p_gennisi"></span></span><span class="f"></span></div>
-            <div class="dl pd" style="margin:0 100px 4px 0;"><span><b>Τόπος Γέννησης:</b> <span id="p_topos"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 4px 0;"><span><b>Επώνυμο:</b> <span id="p_eponymo"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 4px 0;"><span><b>Όνομα:</b> <span id="p_onoma"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 4px 0;"><span><b>Πατρώνυμο:</b> <span id="p_patronymo"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 4px 0;"><span><b>Ημ. Γέννησης:</b> <span id="p_gennisi"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 4px 0;"><span><b>Τόπος Γέννησης:</b> <span id="p_topos"></span></span><span class="f"></span></div>
+            <div class="dl pd" style="margin:0 112px 0 0;"><span><b>Ξένες Γλώσσες:</b> <span id="p_glosses"></span></span><span class="f"></span></div>
           </div>
-          <div class="dl pd" style="margin-top:2px;"><span><b>Ξένες Γλώσσες:</b> <span id="p_glosses"></span></span><span class="f"></span></div>
         </div>
 
         <div>
@@ -1383,7 +1383,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
   function move(e){
     if(!drawing) return;
     const p = getPos(e);
-    ctx.strokeStyle = '#152A4E';
+    ctx.strokeStyle = '#1A3FA0';
     ctx.lineWidth = 4;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
@@ -1600,7 +1600,8 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       const wm = await loadImage(WATERMARK_SRC);
       const scale = Math.min(finalCanvas.width / wm.width, finalCanvas.height / wm.height) * 0.62;
       const wmW = wm.width * scale, wmH = wm.height * scale;
-      const wx = (finalCanvas.width - wmW) / 2, wy = (finalCanvas.height - wmH) / 2;
+      const pxScale = finalCanvas.width / el.offsetWidth; // canvas px per CSS px, so the 100px shift matches the on-page scale
+      const wx = (finalCanvas.width - wmW) / 2, wy = (finalCanvas.height - wmH) / 2 + 100 * pxScale;
       fctx.save();
       fctx.setTransform(1,0,0,1,0,0);
       fctx.globalAlpha = 0.14;
