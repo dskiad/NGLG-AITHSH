@@ -1548,13 +1548,37 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
   }
 
   function pad2(n){ return String(n).padStart(2,'0'); }
+
+  // Greek → Latin transliteration for filenames: some browsers/OS share-sheets and
+  // downloads managers mangle non-ASCII (Greek) filenames into garbled/CJK-looking
+  // text, so the actual saved/shared file name is built from ASCII only. This keeps
+  // the surname recognizable (e.g. ΠΑΠΑΔΟΠΟΥΛΟΣ → PAPADOPOULOS) instead of corrupted.
+  const GREEK_TO_LATIN = {
+    'Α':'A','Β':'V','Γ':'G','Δ':'D','Ε':'E','Ζ':'Z','Η':'H','Θ':'TH','Ι':'I','Κ':'K',
+    'Λ':'L','Μ':'M','Ν':'N','Ξ':'X','Ο':'O','Π':'P','Ρ':'R','Σ':'S','Τ':'T','Υ':'Y',
+    'Φ':'F','Χ':'CH','Ψ':'PS','Ω':'O',
+    'α':'a','β':'v','γ':'g','δ':'d','ε':'e','ζ':'z','η':'h','θ':'th','ι':'i','κ':'k',
+    'λ':'l','μ':'m','ν':'n','ξ':'x','ο':'o','π':'p','ρ':'r','σ':'s','ς':'s','τ':'t','υ':'y',
+    'φ':'f','χ':'ch','ψ':'ps','ω':'o',
+    'Ά':'A','Έ':'E','Ή':'H','Ί':'I','Ό':'O','Ύ':'Y','Ώ':'O','Ϊ':'I','Ϋ':'Y',
+    'ά':'a','έ':'e','ή':'h','ί':'i','ό':'o','ύ':'y','ώ':'o','ϊ':'i','ϋ':'y','ΐ':'i','ΰ':'y'
+  };
+  function greekToLatin(str){
+    return String(str).split('').map(ch => GREEK_TO_LATIN[ch] !== undefined ? GREEK_TO_LATIN[ch] : ch).join('');
+  }
+  function safeFilenamePart(str, fallback){
+    const cleaned = greekToLatin(str || '')
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Za-z0-9_-]/g, '');
+    return cleaned || fallback;
+  }
   function buildFilename(){
     const now = new Date();
     const yyyy = now.getFullYear();
     const mm = pad2(now.getMonth()+1);
     const dd = pad2(now.getDate());
-    const surname = (val('eponymo') || 'Αίτηση').replace(/\s+/g,'_');
-    return `${yyyy}_${mm}_ΑΙΤΗΣΗ_${surname}_${dd}_v1.pdf`;
+    const surname = safeFilenamePart(val('eponymo'), 'AITHSH');
+    return `${yyyy}_${mm}_AITHSH_${surname}_${dd}_v1.pdf`;
   }
 
   // ---------- generate PDF ----------
