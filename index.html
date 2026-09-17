@@ -532,11 +532,14 @@
         <a id="pdfOpenLink" href="#" target="_blank" rel="noopener" style="flex:1;min-width:140px;text-align:center;display:inline-block;padding:12px 14px;background:var(--navy);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;">👁 Προβολή σε νέα καρτέλα</a>
         <a id="pdfDownloadLink" href="#" style="flex:1;min-width:140px;text-align:center;display:inline-block;padding:12px 14px;background:var(--gold);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;">⬇ Λήψη PDF</a>
         <button type="button" id="pdfShareBtn" style="display:none;flex:1;min-width:140px;text-align:center;padding:12px 14px;background:#25863B;color:#fff;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;">📤 Κοινοποίηση (WhatsApp/Email…)</button>
+        <a id="pdfEmailLink" href="#" style="flex:1;min-width:140px;text-align:center;display:inline-block;padding:12px 14px;background:#0B3D91;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;">✉️ Email στην Ε.Μ.Στ.Ε.</a>
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;">
         Αν η «Λήψη» δεν αποθηκεύσει το αρχείο στη συσκευή σας, πατήστε «Προβολή σε νέα καρτέλα» —
         ο browser θα ανοίξει το PDF και από εκεί μπορείτε να το αποθηκεύσετε ή να το μοιραστείτε
-        με το εικονίδιο κοινοποίησης του browser σας.
+        με το εικονίδιο κοινοποίησης του browser σας. Το «Email στην Ε.Μ.Στ.Ε.» ανοίγει την εφαρμογή
+        email σας με παραλήπτη το info@nglgreece.gr έτοιμο — απλώς επισυνάψτε το PDF που μόλις
+        κατεβάσατε πριν το στείλετε, καθώς οι browsers δεν επιτρέπουν αυτόματη επισύναψη αρχείων.
       </div>
     </div>
     <p class="note">
@@ -654,6 +657,7 @@
 
     <div style="margin-top:auto;padding-top:20px;flex:0 0 auto;">
       <div style="border-top:1px solid #D8BE7C;margin-bottom:8px;"></div>
+      <div style="text-align:center;font-size:16px;font-weight:800;color:#0B3D91;margin-bottom:8px;">email: info@nglgreece.gr</div>
       <div style="font-size:7.8px;line-height:1.5;color:#3A4356;">
         Ενημέρωση GDPR: Τα ανωτέρω προσωπικά δεδομένα συλλέγονται και τυγχάνουν επεξεργασίας από την Εθνική Μεγάλη Στοά της Ελλάδος, σύμφωνα με τον Κανονισμό (ΕΕ) 2016/679 και τον Ν. 4624/2019, αποκλειστικά για τον σκοπό αξιολόγησης της παρούσας αίτησης και τη διαχείριση του μητρώου μελών. Ο υποψήφιος διατηρεί δικαιώματα πρόσβασης, διόρθωσης, διαγραφής, περιορισμού και εναντίωσης, καθώς και δικαίωμα καταγγελίας στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).
       </div>
@@ -723,6 +727,11 @@
     <div style="font-size:9.6px;margin-top:6px;">☐ μυήθηκε&nbsp;&nbsp;&nbsp;&nbsp;☐ υιοθετήθηκε&nbsp;&nbsp;&nbsp;&nbsp;☐ επανεντάχθηκε&nbsp;&nbsp;&nbsp;&nbsp;την …………… 20…… στη Στοά μας, έλαβε Αριθμό Μητρώου ……………</div>
     <div style="font-size:9.6px;margin-top:4px;">και η οικονομική του υποχρέωση καταβλήθηκε στη Μεγάλη Γραμματεία.</div>
     <div style="margin-top:10px;font-size:9.6px;">Ημερομηνία: …………………… 20……　　Όνομα &amp; υπογραφή Γραμματέα (σφραγίδα): ……………………………………</div>
+
+    <div style="margin-top:auto;padding-top:20px;flex:0 0 auto;">
+      <div style="border-top:1px solid #D8BE7C;margin-bottom:8px;"></div>
+      <div style="text-align:center;font-size:16px;font-weight:800;color:#0B3D91;">email: info@nglgreece.gr</div>
+    </div>
   </div>
 
 </div>
@@ -1743,6 +1752,16 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       const dlLink = $('pdfDownloadLink');
       dlLink.href = blobUrl;
       dlLink.setAttribute('download', filename);
+
+      // 3b) pre-addressed email to the Lodge — opens the user's mail app with
+      // "To: info@nglgreece.gr" and a subject already filled in. Browsers give
+      // web pages no way to auto-attach a file to a mailto link, so the user
+      // still has to attach the PDF they just downloaded before hitting send.
+      const emailLink = $('pdfEmailLink');
+      const applicantName = [val('eponymo'), val('onoma')].filter(Boolean).join(' ');
+      const emailSubject = `Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς — ${applicantName || filename}`;
+      const emailBody = 'Επισυνάπτεται η αίτησή μου σε μορφή PDF.\n\n(Παρακαλώ επισυνάψτε το αρχείο PDF που κατεβάσατε πριν στείλετε αυτό το e-mail.)';
+      emailLink.href = `mailto:info@nglgreece.gr?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
       // 4) native share sheet (WhatsApp / Mail / Save to Files…) when supported
       const shareBtn = $('pdfShareBtn');
