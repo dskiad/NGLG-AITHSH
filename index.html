@@ -26,9 +26,9 @@
     color:var(--ink);
     padding-bottom:60px;
   }
-  .wrap{max-width:640px;margin:0 auto;padding:0 16px;}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px;}
   header.hero{
-    max-width:640px;margin:0 auto;
+    max-width:720px;margin:0 auto;
     padding:28px 20px 22px;
     text-align:center;
     color:#fff;
@@ -53,7 +53,7 @@
   }
 
   .progressbar{
-    max-width:640px;margin:-14px auto 18px;padding:0 16px;
+    max-width:720px;margin:-14px auto 18px;padding:0 16px;
   }
   .progressbar .track{
     height:6px;background:#EFE9D8;border-radius:6px;overflow:hidden;
@@ -155,11 +155,25 @@
   .toggle-declar.open .chev{transform:rotate(180deg);}
 
   .check-row{
-    display:flex;align-items:flex-start;gap:10px;margin-top:12px;
+    display:flex;align-items:flex-start;gap:10px;margin-top:12px;cursor:pointer;
     background:#F4EFE1;border:1px solid var(--gold-light);border-radius:10px;padding:12px;
+    transition:background .15s, border-color .15s;
   }
-  .check-row input{width:19px;height:19px;flex:0 0 auto;margin-top:1px;accent-color:var(--navy);}
+  .check-row input{width:19px;height:19px;flex:0 0 auto;margin-top:1px;accent-color:var(--navy);cursor:pointer;}
   .check-row span{font-size:12.5px;color:#3A4356;line-height:1.5;}
+
+  /* Hover feedback for mouse/trackpad users (Windows/Mac desktop) — scoped so it
+     never sticks on touch screens, where there's no real hover state. */
+  @media (hover:hover) and (pointer:fine){
+    .check-row:hover{background:#EFE6CC;border-color:var(--gold);}
+    .segmented input:not(:checked) + label:hover{background:#F1ECDF;}
+    .toggle-declar:hover{color:var(--gold);}
+    .sig-actions button:hover{color:var(--gold);}
+    label[for="photoInput"]:hover{filter:brightness(1.12);}
+    .btn-generate:not(:disabled):hover{filter:brightness(1.1);box-shadow:0 12px 26px -10px rgba(15,31,62,.85);}
+    #pdfOpenLink:hover,#pdfDownloadLink:hover,#pdfShareBtn:hover{filter:brightness(1.1);}
+    canvas#sigCanvas{cursor:crosshair;}
+  }
 
   .sigwrap{
     border:1.5px dashed #C9BFA0;border-radius:12px;background:#FCFBF7;
@@ -177,7 +191,7 @@
   }
 
   .generate-bar{
-    max-width:640px;margin:6px auto 0;padding:0 16px;
+    max-width:720px;margin:6px auto 0;padding:0 16px;
   }
   .btn-generate{
     width:100%;padding:16px;border:none;border-radius:12px;
@@ -194,12 +208,22 @@
   }
   .errbox{
     display:none;background:#FBEAEA;border:1px solid #EFC3C0;color:var(--danger);
-    border-radius:10px;padding:12px 14px;font-size:12.5px;margin:0 auto 14px;max-width:640px;
+    border-radius:10px;padding:12px 14px;font-size:12.5px;margin:0 auto 14px;max-width:720px;
     line-height:1.6;
   }
   .field.invalid input,.field.invalid select{border-color:var(--danger);}
   footer.credit{
     text-align:center;color:#A9A296;font-size:10.5px;margin-top:28px;
+  }
+  footer.credit .footer-email{
+    margin-top:10px;font-size:16px;font-weight:800;
+  }
+  footer.credit .footer-email a{
+    color:#0B3D91;text-decoration:none;
+  }
+  footer.credit .footer-email a:hover,
+  footer.credit .footer-email a:focus-visible{
+    text-decoration:underline;
   }
 
   @media (max-width:380px){
@@ -260,10 +284,10 @@
     <div class="field">
       <label for="stoaName">Στην Στοά «…»</label>
       <input type="text" id="stoaName" placeholder="π.χ. Πυθαγόρας" required>
-      <div class="check-row" style="margin-top:8px;">
+      <label class="check-row" style="margin-top:8px;">
         <input type="checkbox" id="stoaUnknown">
         <span>Δεν γνωρίζω τη Στοά — στη διάθεση της Μεγάλης Γραμματείας</span>
-      </div>
+      </label>
     </div>
     <div class="row2">
       <div class="field">
@@ -442,10 +466,10 @@
       <label>Περίοδος ως Α΄/Β΄ Επόπτης</label>
       <input type="text" id="periodEp" placeholder="π.χ. 2016-2017">
     </div>
-    <div class="check-row">
+    <label class="check-row">
       <input type="checkbox" id="diplomaCheck">
       <span>Υποβάλλω αντίγραφο του διπλώματός μου, καθώς και βεβαίωση ταμειακής μου κατάστασης της τελευταίας Στοάς στην οποία υπήρξα μέλος.</span>
-    </div>
+    </label>
   </div>
 
   <!-- 9 Declarations -->
@@ -454,10 +478,10 @@
     <div class="declar open" id="declarBox" style="font-size:15px;font-weight:700;color:var(--navy);line-height:1.5;padding:14px 16px;">
       Η αίτησή μου αυτή υποβάλλεται με απόλυτη και ελεύθερη βούλησή μου.
     </div>
-    <div class="check-row">
+    <label class="check-row">
       <input type="checkbox" id="declarAccept" required>
       <span>Αποδέχομαι και δηλώνω υπεύθυνα την ανωτέρω δήλωση.</span>
-    </div>
+    </label>
   </div>
 
   <!-- 8 GDPR -->
@@ -472,10 +496,10 @@
         <li>Τα δεδομένα τηρούνται για όσο διάστημα απαιτείται για τους ανωτέρω σκοπούς και σύμφωνα με τον Κανονισμό της Στοάς.</li>
       </ol>
     </div>
-    <div class="check-row">
+    <label class="check-row">
       <input type="checkbox" id="gdprAccept" required>
       <span>Έχω διαβάσει και αποδέχομαι την ανωτέρω ενημέρωση και συναινώ στην επεξεργασία των προσωπικών μου δεδομένων για τους σκοπούς της παρούσας αίτησης.</span>
-    </div>
+    </label>
   </div>
 
   <!-- 10 Date + signature -->
@@ -527,7 +551,10 @@
   </div>
 </form>
 
-<footer class="credit">Εθνική Μεγάλη Στοά της Ελλάδος &middot; Έντυπο Αίτησης Εισδοχής/Υιοθεσίας/Επαναφοράς</footer>
+<footer class="credit">
+  Εθνική Μεγάλη Στοά της Ελλάδος &middot; Έντυπο Αίτησης Εισδοχής/Υιοθεσίας/Επαναφοράς
+  <div class="footer-email">email: <a href="mailto:info@nglgreece.gr">info@nglgreece.gr</a></div>
+</footer>
 
 <!-- ===================== PRINT TEMPLATES (off-screen) ===================== -->
 <div style="position:fixed;top:-99999px;left:0;">
