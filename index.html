@@ -171,6 +171,7 @@
     .sig-actions button:hover{color:var(--gold);}
     label[for="photoInput"]:hover{filter:brightness(1.12);}
     .btn-generate:not(:disabled):hover{filter:brightness(1.1);box-shadow:0 12px 26px -10px rgba(15,31,62,.85);}
+    .btn-blank:not(:disabled):hover{filter:brightness(1.12);box-shadow:0 12px 24px -10px rgba(138,23,18,.85);}
     #pdfOpenLink:hover,#pdfDownloadLink:hover,#pdfShareBtn:hover{filter:brightness(1.1);}
     canvas#sigCanvas{cursor:crosshair;}
   }
@@ -202,6 +203,14 @@
   }
   .btn-generate:disabled{opacity:.65;}
   .btn-generate .gold-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);}
+  .btn-blank{
+    width:100%;padding:13px 16px;border:2px solid var(--gold);border-radius:12px;
+    background:linear-gradient(180deg,#C0221B,#8A1712);
+    color:var(--gold-light);font-size:14px;font-weight:800;letter-spacing:.01em;
+    box-shadow:0 10px 20px -10px rgba(138,23,18,.65);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .btn-blank:disabled{opacity:.65;}
   .note{
     font-size:11.5px;color:var(--muted);text-align:center;margin:12px auto 0;max-width:520px;
     line-height:1.6;
@@ -252,6 +261,11 @@
   <h2>Αίτηση Εισδοχής · Υιοθεσίας · Επαναφοράς</h2>
   <div class="sub">Συμπληρώστε στο κινητό σας &middot; υπογράψτε με το δάχτυλο &middot; λάβετε το τελικό PDF</div>
 </header>
+
+<div class="wrap" style="margin:14px 0 6px;">
+  <button type="button" class="btn-blank" id="blankBtn">📄 Νέα Αίτηση χωρίς στοιχεία</button>
+  <p class="note" style="margin-top:8px;">Κενό έντυπο 2 σελίδων, χωρίς κανένα προσωπικό στοιχείο — για προεπισκόπηση, εκτύπωση ή λήψη, ώστε να συμπληρωθεί χειρόγραφα.</p>
+</div>
 
 <div class="progressbar">
   <div class="track"><div class="fill" id="progressFill"></div></div>
@@ -1583,6 +1597,24 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     $('p2_ref').textContent = [refName, refStoa].filter(Boolean).join(' — ') || '—';
   }
 
+  // Fills the print template with nothing but blank lines/boxes — a clean 2-page
+  // form ready to print and fill in by hand, regardless of whatever is currently
+  // typed into the on-screen form above.
+  function populatePrintBlank(){
+    $('p_photo').removeAttribute('src');
+    $('p_photo').style.display = 'none';
+
+    ['p_stoa','p_stoaArith','p_stoaPerif','p_eponymo','p_onoma','p_patronymo',
+     'p_kinito','p_email','p_odos','p_arithKat','p_takKod','p_poli','p_tilKat',
+     'p_gennisi','p_topos','p_glosses','p_proposed','p_proposedStoa',
+     'p_declar','p_gdpr','p_type','p_date'
+    ].forEach(id => { const el = $(id); if(el) el.textContent = ''; });
+
+    $('p_adoptWrap').style.display = 'none';
+    $('p_sig').removeAttribute('src');
+    $('p2_ref').textContent = '';
+  }
+
   function pad2(n){ return String(n).padStart(2,'0'); }
 
   // Greek → Latin transliteration for filenames: some browsers/OS share-sheets and
@@ -1615,6 +1647,13 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
     const dd = pad2(now.getDate());
     const surname = safeFilenamePart(val('eponymo'), 'AITHSH');
     return `${yyyy}_${mm}_AITHSH_${surname}_${dd}_v1.pdf`;
+  }
+  function buildBlankFilename(){
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = pad2(now.getMonth()+1);
+    const dd = pad2(now.getDate());
+    return `${yyyy}_${mm}_AITHSH_KENH_FORMA_${dd}.pdf`;
   }
 
   // ---------- generate PDF ----------
@@ -1699,26 +1738,21 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
 
   let lastBlobUrl = null;
 
-  genBtn.addEventListener('click', async ()=>{
-    const errors = validate();
-    errBox.style.display = 'none';
-    $('pdfResult').style.display = 'none';
-    if(errors.length){
-      errBox.innerHTML = '<b>Συμπληρώστε πριν συνεχίσετε:</b><br>' + errors.map(e=>'• '+e).join('<br>');
-      errBox.style.display = 'block';
-      errBox.scrollIntoView({behavior:'smooth', block:'center'});
-      return;
-    }
-
-    populatePrint();
-    genBtn.disabled = true;
-    genBtn.innerHTML = '<span class="gold-dot"></span> Δημιουργία PDF…';
+  // Renders whatever is currently in printPage1/printPage2 into a 2-page PDF and
+  // wires up the preview/download/email/share controls. Shared by the normal
+  // "Δημιουργία Αίτησης" flow and the blank-form flow below — the only
+  // difference between them is which populate function ran first and which
+  // button is being driven.
+  async function buildAndOfferPdf(opts){
+    const { withPhoto, filename, emailSubject, shareText, triggerBtn, busyHTML, idleHTML } = opts;
+    triggerBtn.disabled = true;
+    triggerBtn.innerHTML = busyHTML;
 
     try{
       const { jsPDF } = window.jspdf;
 
       const printPage1El = document.getElementById('printPage1');
-      const canvas1 = await renderPageLayered(printPage1El, {withPhoto:true});
+      const canvas1 = await renderPageLayered(printPage1El, {withPhoto});
       const canvas2 = await renderPageLayered(document.getElementById('printPage2'), {withPhoto:false});
 
       const pdfWidth = 595.28; // A4 width in pt
@@ -1733,7 +1767,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       doc.addPage([pdfWidth, h2], orient2);
       doc.addImage(canvas2.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfWidth, h2);
 
-      const filename = buildFilename();
       const blob = doc.output('blob');
 
       if(lastBlobUrl){ URL.revokeObjectURL(lastBlobUrl); }
@@ -1758,9 +1791,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       // web pages no way to auto-attach a file to a mailto link, so the user
       // still has to attach the PDF they just downloaded before hitting send.
       const emailLink = $('pdfEmailLink');
-      const applicantName = [val('eponymo'), val('onoma')].filter(Boolean).join(' ');
-      const emailSubject = `Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς — ${applicantName || filename}`;
-      const emailBody = 'Επισυνάπτεται η αίτησή μου σε μορφή PDF.\n\n(Παρακαλώ επισυνάψτε το αρχείο PDF που κατεβάσατε πριν στείλετε αυτό το e-mail.)';
+      const emailBody = 'Επισυνάπτεται το PDF.\n\n(Παρακαλώ επισυνάψτε το αρχείο PDF που κατεβάσατε πριν στείλετε αυτό το e-mail.)';
       emailLink.href = `mailto:info@nglgreece.gr?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
       // 4) native share sheet (WhatsApp / Mail / Save to Files…) when supported
@@ -1775,7 +1806,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
             navigator.share({
               files:[file],
               title: filename,
-              text: 'Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς'
+              text: shareText
             }).catch(()=>{ /* user cancelled — ignore */ });
           };
         }
@@ -1793,10 +1824,54 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var n,r,i,a,
       errBox.style.display = 'block';
       errBox.scrollIntoView({behavior:'smooth', block:'center'});
     }finally{
-      genBtn.disabled = false;
-      genBtn.innerHTML = '<span class="gold-dot"></span> Δημιουργία Αίτησης (PDF)';
+      triggerBtn.disabled = false;
+      triggerBtn.innerHTML = idleHTML;
     }
+  }
+
+  genBtn.addEventListener('click', async ()=>{
+    const errors = validate();
+    errBox.style.display = 'none';
+    $('pdfResult').style.display = 'none';
+    if(errors.length){
+      errBox.innerHTML = '<b>Συμπληρώστε πριν συνεχίσετε:</b><br>' + errors.map(e=>'• '+e).join('<br>');
+      errBox.style.display = 'block';
+      errBox.scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
+
+    populatePrint();
+    const applicantName = [val('eponymo'), val('onoma')].filter(Boolean).join(' ');
+    await buildAndOfferPdf({
+      withPhoto: true,
+      filename: buildFilename(),
+      emailSubject: `Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς — ${applicantName || 'Αίτηση'}`,
+      shareText: 'Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς',
+      triggerBtn: genBtn,
+      busyHTML: '<span class="gold-dot"></span> Δημιουργία PDF…',
+      idleHTML: '<span class="gold-dot"></span> Δημιουργία Αίτησης (PDF)'
+    });
   });
+
+  // ---------- blank/empty petition (print-and-fill-by-hand template) ----------
+  const blankBtn = $('blankBtn');
+  if(blankBtn){
+    blankBtn.addEventListener('click', async ()=>{
+      errBox.style.display = 'none';
+      $('pdfResult').style.display = 'none';
+
+      populatePrintBlank();
+      await buildAndOfferPdf({
+        withPhoto: false,
+        filename: buildBlankFilename(),
+        emailSubject: 'Αίτηση Εισδοχής/Υιοθεσίας/Επαναφοράς — κενό έντυπο',
+        shareText: 'Κενό έντυπο Αίτησης Εισδοχής/Υιοθεσίας/Επαναφοράς',
+        triggerBtn: blankBtn,
+        busyHTML: 'Δημιουργία…',
+        idleHTML: '📄 Νέα Αίτηση χωρίς στοιχεία'
+      });
+    });
+  }
 
   // ---------- draft autosave (works in Claude's artifact storage AND a plain browser tab) ----------
   const DRAFT_KEY = 'nglg_aitisi_draft_v1';
